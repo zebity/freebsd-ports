@@ -1,0 +1,18 @@
+This branch is an attempt to replicate FreeBSD Ports SW Build/Install Mechanism on IRIX 6,5
+
+See: https://just.graphica.com.au/tips/bootstrap-gnu-tools-on-sgi-irix/
+
+As SGI IRIX is long retired and unsupported UNIX varient the objective here
+is just to support the small number of tools and uses who need or like to use
+SGI IRIX systems.
+
+To keep things simple the tree has not been trimmed but if you look at the
+Description File within port you can see if it has been IRIXised.
+
+All feedback via the github repo.
+
+For information about FreeBSD ports, please see the Porter's
+Handbook, available at:
+
+        https://docs.freebsd.org/en/books/porters-handbook/
+
