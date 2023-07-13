@@ -42,4 +42,4 @@ post-install-EXAMPLES-on:
 	${MKDIR} ${STAGEDIR}${EXAMPLESDIR}/
 	${INSTALL_DATA} ${WRKSRC}/examples/*.m4 ${STAGEDIR}${EXAMPLESDIR}/
 
-.include <bsd.port.mk>
+.include <irix.port.mk>
