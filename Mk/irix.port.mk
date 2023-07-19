@@ -1,7 +1,8 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-#	bsd.port.mk - 940820 Jordan K. Hubbard.
+#	irix.port.mk - 20230719 John Hartley.
+#	based on: bsd.port.mk - 940820 Jordan K. Hubbard.
 #	This file is in the public domain.
 #
 # Please view me with 4 column tabs!
@@ -1007,6 +1008,11 @@ FreeBSD_MAINTAINER=	portmgr@FreeBSD.org
 # Most port authors should not need to understand anything after this point.
 #
 
+## IRIX VERSION MIN/MAX
+
+IRIX_VER_MIN=19980601
+IRIX_VER_MAX=20130720
+
 LANG=		C
 LC_ALL=		C
 .export		LANG LC_ALL
@@ -1063,7 +1069,7 @@ _PORTS_DIRECTORIES+=	${PKG_DBDIR} ${PREFIX} ${WRKDIR} ${EXTRACT_WRKDIR} \
 # make sure bmake treats -V as expected
 .MAKE.EXPAND_VARIABLES= yes
 
-.include "${PORTSDIR}/Mk/bsd.commands.mk"
+.include "${PORTSDIR}/Mk/irix.commands.mk"
 
 # Do not leak flavors to childs make
 .MAKEOVERRIDES:=	${.MAKEOVERRIDES:NFLAVOR}
@@ -1104,7 +1110,7 @@ STRIPBIN=	${STRIP_CMD}
 .if defined(DESTDIR) && !empty(DESTDIR) && !defined(CHROOTED) && \
 	!defined(BEFOREPORTMK) && !defined(INOPTIONSMK)
 
-.include "${PORTSDIR}/Mk/bsd.destdir.mk"
+.include "${PORTSDIR}/Mk/irix.destdir.mk"
 
 .else
 
@@ -1146,11 +1152,12 @@ _EXPORTED_VARS+=	PPC_ABI
 
 # Get operating system versions for a cross build
 .    if defined(CROSS_SYSROOT)
-.      if !exists(${CROSS_SYSROOT}/usr/include/sys/param.h)
-.error CROSS_SYSROOT does not include /usr/include/sys/param.h.
-.      endif
-OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${CROSS_SYSROOT}/usr/include/sys/param.h
-_OSRELEASE!= ${AWK} -v version=${OSVERSION} 'END { printf("%d.%d-CROSS", version / 100000, version / 1000 % 100) }' < /dev/null
+.error Cross build not supported with IRIX - CROSS_SYSROOT = '${CROSS_SYSROOT}'.
+# .      if !exists(${CROSS_SYSROOT}/usr/include/sys/param.h)
+# .error CROSS_SYSROOT does not include /usr/include/sys/param.h.
+# .      endif
+# OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${CROSS_SYSROOT}/usr/include/sys/param.h
+# _OSRELEASE!= ${AWK} -v version=${OSVERSION} 'END { printf("%d.%d-CROSS", version / 100000, version / 1000 % 100) }' < /dev/null
 .    endif
 
 # Get the operating system type
@@ -1169,18 +1176,29 @@ OSREL?=	${_OSRELEASE:C/-.*//}
 _EXPORTED_VARS+=	OSREL
 
 # Get __FreeBSD_version
+# Get __IRIX_version
 .    if !defined(OSVERSION)
-.      if exists(/usr/include/sys/param.h)
-OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < /usr/include/sys/param.h
-.      elif exists(${SRC_BASE}/sys/sys/param.h)
-OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${SRC_BASE}/sys/sys/param.h
-.      else
+_OSVERDATE!= ${UNAME} -aR | ${CUT} -f5 -d" "
+_OSYEAR!= echo "${_OSVERDATE}" | ${CUT} -b 5-8
+_OSMONTH!= echo "${_OSVERDATE}" | ${CUT} -b 1-2
+_OSDAY!= echo "${_OSVERDATE}" | ${CUT} -b 3-4
+OSVERSION = ${_OSYEAR}${_OSMONTH}${_OSDAY}
+.      if !defined(OSVERSION)
+# OSVERSION!=	${UNAME} -r
+# OSVERSION!=	${UNAME} -r | ${CUT} -f4 -d" "
+# .      if exists(/usr/include/sys/param.h)
+#OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < /usr/include/sys/param.h
+#.      elif exists(${SRC_BASE}/sys/sys/param.h)
+#OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${SRC_BASE}/sys/sys/param.h
 .error Unable to determine OS version.  Either define OSVERSION, install /usr/include/sys/param.h or define SRC_BASE.
 .      endif
 .    endif
 _EXPORTED_VARS+=	OSVERSION
 
-.    if ${OPSYS} == FreeBSD && (${OSVERSION} < 1204000 || (${OSVERSION} >= 1300000 && ${OSVERSION} < 1301000))
+#.    if ${OPSYS} == FreeBSD && (${OSVERSION} < 1204000 || (${OSVERSION} >= 1300000 && ${OSVERSION} < 1301000))
+#    IRIX64 6.5 to 6.5.30
+.    if ${OPSYS} == IRIX64 && (${OSVERSION} < ${IRIX_VER_MIN} || (${OSVERSION} >= ${IRIX_VER_MAX} && ${OSVERSION} < ${IRIX_VER_MIN}))
+
 _UNSUPPORTED_SYSTEM_MESSAGE=	Ports Collection support for your ${OPSYS} version has ended, and no ports\
 								are guaranteed to build on this system. Please upgrade to a supported release.
 .      if defined(ALLOW_UNSUPPORTED_SYSTEM)
@@ -1198,7 +1216,7 @@ show-unsupported-system-error:
 .    endif
 
 # Convert OSVERSION to major release number
-_OSVERSION_MAJOR=	${OSVERSION:C/([0-9]?[0-9])([0-9][0-9])[0-9]{3}/\1/}
+_OSVERSION_MAJOR!=	${UNAME} -r | ${CUT} -f1 -d"."
 # Sanity checks for chroot/jail building.
 # Skip if OSVERSION specified on cmdline for testing. Only works for bmake.
 .    if !defined(.MAKEOVERRIDES) || !${.MAKEOVERRIDES:MOSVERSION}
@@ -1212,7 +1230,7 @@ _OSVERSION_MAJOR=	${OSVERSION:C/([0-9]?[0-9])([0-9][0-9])[0-9]{3}/\1/}
 .    endif
 
 # Only define tools here (for transition period with between pkg tools)
-.include "${PORTSDIR}/Mk/bsd.commands.mk"
+.include "${PORTSDIR}/Mk/irix.commands.mk"
 
 .    if !defined(_PKG_CHECKED) && !defined(PACKAGE_BUILDING) && exists(${PKG_BIN})
 .      if !defined(_PKG_VERSION)
@@ -1319,8 +1337,8 @@ WITH_LTO=	${USE_LTO}
 WARNING+=	USE_LTO is deprecated in favor of WITH_LTO
 .    endif
 
-.include "${PORTSDIR}/Mk/bsd.default-versions.mk"
-.include "${PORTSDIR}/Mk/bsd.options.mk"
+.include "${PORTSDIR}/Mk/irix.default-versions.mk"
+.include "${PORTSDIR}/Mk/irix.options.mk"
 
 .  endif
 # End of options section.
@@ -2041,8 +2059,21 @@ MAKE_JOBS_NUMBER=	1
 _MAKE_JOBS_NUMBER:=	${MAKE_JOBS_NUMBER}
 .      else
 .        if !defined(_SMP_CPUS)
-_SMP_CPUS!=		${NPROC} 2>/dev/null || ${SYSCTL} -n kern.smp.cpus
-.        endif
+_HINV_PROCS!= ${HINV} -c processor | ${GREP} -c CPU
+
+.    	    if ${_HINV_PROCS} > 1
+_SMP_CPUS=${_HINV_PROCS}
+# _SMP_CPUS!=		${NPROC} 2>/dev/null || ${SYSCTL} -n kern.smp.cpus
+.      	    else
+_HINV_PROCS!= ${HINV} -c processor | ${GREP} Processors | ${CUT} -f1 -d" "
+.	      if ${_HINV_PROCS} == ""
+_HINV_PROCS!= ${HINV} -c processor | ${GREP} 'HZ\(.*\)Processor' | ${CUT} -f1 -d" "
+_SMP_CPU = ${_HINV_PROCS}
+.	      else
+_SMP_CPUS = ${_HINV_PROCS}
+.	      endif
+.	    endif
+.	 endif
 _EXPORTED_VARS+=	_SMP_CPUS
 _MAKE_JOBS_NUMBER=	${_SMP_CPUS}
 .      endif
@@ -2620,7 +2651,8 @@ CONFIG_SITE?=		${PORTSDIR}/Templates/config.site
 .    if defined(GNU_CONFIGURE)
 # Maximum command line length
 .      if !defined(CONFIGURE_MAX_CMD_LEN)
-CONFIGURE_MAX_CMD_LEN!=	${SYSCTL} -n kern.argmax
+# CONFIGURE_MAX_CMD_LEN!=	${SYSCTL} -n kern.argmax
+CONFIGURE_MAX_CMD_LEN!=	${GETCONF} ARG_MAX
 .      endif
 _EXPORTED_VARS+=	CONFIGURE_MAX_CMD_LEN
 GNU_CONFIGURE_PREFIX?=	${PREFIX}
