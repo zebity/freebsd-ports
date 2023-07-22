@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # NAME:
 #	irix.fetch.sh - optimistic wrapper for FreeBSD fetch command

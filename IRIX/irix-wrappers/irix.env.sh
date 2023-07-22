@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # NAME:
 #	irix.env.sh - wrapper for FreeBSD env command
@@ -82,77 +82,87 @@ if [ $* -eq 1 ]; then
 	${IRIX_ENV}
 else
 
-set -- `getopt 0iL:U:P:S:u:v $*`
+	savargs="$*"
 
-output=:
-inherit=;
-user=;
-class=;
-altpath=;
-string=;
-name=;
-verbose=no;
-extraverbose=no;
+	set -- `getopt 0iL:U:P:S:u:v $*`
 
-while :
-do
-        case "$1" in
-        --)     shift; break;;
-	-0)	output=null ;; 
-        -i)     inherit="-i" ;;
-        -L)     class=$2; shift;;
-        -U)     user=$2; shift;;
-        -P)     altpath=$2; shift;;
-        -S)     string=$2; shift;;
-	-u)	name=$2; shift;;
-	-v)	if [ ${verbose} = "no" ]; then
+	output=:
+	inherit=;
+	user=;
+	class=;
+	altpath=;
+	string=;
+	name=;
+	verbose=no;
+	extraverbose=no;
+	space=" "
+
+	while :
+	do
+       	 case "$1" in
+       	 --)     shift; break;;
+		-0)	output=null ;; 
+       	 -i)     inherit="-i" ;;
+       	 -L)     class=$2; shift;;
+       	 -U)     user=$2; shift;;
+       	 -P)     altpath=$2; shift;;
+       	 -S)     string=$2; shift;;
+	 -u)	name=$2; shift;;
+	 -v)	if [ ${verbose} = "no" ]; then
 			verbose=yes
 		else
 			extraverbaose=yes
 		fi
 		;;
-	*)	break;;
-	esac
-	shift
-done
+	 *)	break;;
+	 esac
+	 shift
+	done
 
-# a bug in HP-UX's /bin/sh, means we need to re-set $*
-# after any calls to add_path()
-args="$*"
+	if [ ${string} ] || [ ${user} ] || [ ${class} ]; then
+		
+ 
+		if [ "${string}" ]; then
+			echo "Expand: '${string}'."
+		fi
+		if [ "${user}" ]; then
+			echo "User Lookup: '${user}'."
+		fi
+		if [ "${class}" ]; then
+			echo "Login Class Lookup: '${class}'."
+		fi
 
-# restore saved $*
-set -- $args
+		# a bug in HP-UX's /bin/sh, means we need to re-set $*
+		# after any calls to add_path()
+		args="$*"
 
-namval=
-utility=
+		# restore saved $*
+		set -- $args
 
-while :
-do
-	nam=`echo "$1" | cut -s -d= -f1`
-	if [ "$nam" ]; then
-		namval="${namval} $1"
-		shift
+		namval=
+		utility=
+
+		while :
+		do
+			echo "namval: %%'$1'%%"
+			nam=`echo "$1" | cut -s -d= -f1`
+			if [ "$nam" ]; then
+				namval="${namval}""${space}""$1"
+				shift
+			else
+				utility="$1"
+				shift
+				break;
+			fi
+		done;
+
+
+		echo "env: ${inherit} ${namval} ${utility} $*"
+
+		${IRIX_ENV} ${inherit} ${namval} ${utility} $*
 	else
-		utility="$1"
-		shift
-		break;
+
+		${IRIX_ENV} "${savargs}"
 	fi
-done;
-
-if [ "${string}" ]; then
-	echo "Expand: '${string}'."
-fi
-
-if [ "${user}" ]; then
-	echo "User Lookup: '${user}'."
-fi
-
-if [ "${class}" ]; then
-	echo "Login Class Lookup: '${class}'."
-fi
-
-echo "env: ${inherit} ${namval} ${utility} $*"
-
-${IRIX_ENV} ${inherit} ${namval} ${utility} $*"
 
 fi

@@ -5,6 +5,8 @@
 set -e
 # set -o pipefail
 
+SETENV_EXT=/usr/local2/bin/env
+
 . "${dp_SCRIPTSDIR}/functions.sh"
 
 validate_env dp_DEVELOPER dp_DISABLE_SIZE dp_DISTDIR dp_DISTINFO_FILE \
@@ -148,7 +150,7 @@ for _file in "${@}"; do
 		case ${dp_TARGET} in
 			do-fetch|makesum)
 				${dp_ECHO_MSG} "=> Attempting to fetch ${site}${file}"
-				if env -S "${dp_FETCH_ENV}" ${_fetch_cmd}; then
+				if ${SETENV_EXT} -S "${dp_FETCH_ENV}" ${_fetch_cmd}; then
 					actual_size=$(stat -f %z "${file}")
 					if [ -n "${dp_DISABLE_SIZE}" ] || [ -z "${CKSIZE}" ] || [ "${actual_size}" -eq "${CKSIZE}" ]; then
 						continue 2

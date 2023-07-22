@@ -82,8 +82,8 @@ RLN?=			${INSTALL} -l rs
 RM?=			/bin/rm -f
 RMDIR?=			/bin/rmdir
 SED?=			/usr/bin/sed
-# SETENV?=		/sbin/env
-SETENV=			which irix.env.sh
+SETENV?=		/sbin/env
+SETENV_EXT?==		/usr/local2/bin/env
 SH?=			/bin/sh
 SORT?=			/usr/bin/sort
 STRIP_CMD?=		/usr/bin/strip
@@ -127,7 +127,7 @@ ECHO_MSG?=		${ECHO_CMD}
 .elif !defined(_PKGTOOLSDEFINED)
 _PKGTOOLSDEFINED=	yes
 # PKG_BIN?=		${LOCALBASE}/sbin/pkg-static
-PKG_BIN?=		which pkg
+PKG_BIN?=		/usr/local2/bin/pkg
 PKG_REGISTER?=		${PKG_BIN} register
 PKG_DELETE?=		${PKG_BIN} delete -y
 PKG_INFO?=		${PKG_BIN} info -g

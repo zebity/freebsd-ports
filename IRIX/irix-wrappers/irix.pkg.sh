@@ -86,7 +86,7 @@
 
 set -- `getopt vdlNj:c:r:C:R:46 $*`
 
-verbose=;
+version=;
 debug=no
 list=;
 options=;
@@ -113,7 +113,7 @@ do
         case "$1" in
         --)     shift; break;;
         -[46N])   ;; # ignore
-	-v)	verbose=yes ;; 
+	-v)	version=yes ;; 
         -d)     debug=yes ;;
         -l)     list=yes ;;
         -o)     options=${options} $2; shift;;
@@ -126,6 +126,13 @@ do
 	esac
 	shift
 done
+
+if [ ${version} ]; then
+	instver=`showprods -En eoe.sw.base | sed -e '/eoe\.sw\.base/!d;/eoe\.sw\.base/s/\(.*\)eoe\.sw\.base\( *\)\([0-9]*\)\( *\)\(.*\)/\3/;'`
+	echo "${instver}"
+	exit 0
+
+fi
 
 # a bug in HP-UX's /bin/sh, means we need to re-set $*
 # after any calls to add_path()
@@ -142,8 +149,12 @@ if [ $# -gt 0 ]; then
 	register)	;;
 	delete)	;;
 	info)		;;
-	version)	instver=`showprods -En eoe.sw.base | grep 'eoe\.sw\.base' | sed -e 's/\(.*\)eoe\.sw\.base\( *\)\([0-9]*\)\( *\)\(.*\)/\3/'`
-			echo "pkg-${instver} ="
+	version)	if [ $2 ] && [ $2 = "-t" ]; then
+				echo "="
+			else
+				instver=`showprods -En eoe.sw.base | sed -e '/eoe\.sw\.base/!d;/eoe\.sw\.base/s/\(.*\)eoe\.sw\.base\( *\)\([0-9]*\)\( *\)\(.*\)/\3/;'`
+				echo "pkg-${instver} ="
+			fi
 			;;
 	create)		;;
 	add)		;;

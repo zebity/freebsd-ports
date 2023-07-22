@@ -1844,7 +1844,7 @@ PKG_ORIGIN=		ports-mgmt/pkg-devel
 .    endif
 
 .    if !defined(PKG_DEPENDS) && !defined(CLEAN_FETCH_ENV)
-PKG_DEPENDS+=	${LOCALBASE}/sbin/pkg:${PKG_ORIGIN}
+PKG_DEPENDS+=	${LOCALBASE}/bin/pkg:${PKG_ORIGIN}
 .    endif
 
 .    if defined(USE_GCC)
