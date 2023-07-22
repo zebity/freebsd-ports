@@ -25,7 +25,7 @@ MAKE_ENV+=	__MAKE_CONF=/dev/null SRCCONF=/dev/null
 PLIST_FILES=	bin/dialog4ports man/man1/${PORTNAME}.1.gz
 .endif
 
-.include <bsd.port.pre.mk>
+.include <irix.port.pre.mk>
 
 .if defined(DEBUG_FLAGS)
 MAKE_ARGS+=	DEBUG_FLAGS="${DEBUG_FLAGS}"
@@ -49,4 +49,4 @@ do-configure:
 
 .endif
 
-.include <bsd.port.post.mk>
+.include <irix.port.post.mk>

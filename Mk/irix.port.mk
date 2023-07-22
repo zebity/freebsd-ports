@@ -1023,7 +1023,7 @@ LC_ALL=		C
 _LIST_OF_WITH_FEATURES=	debug lto ssp pie relro bind_now
 _DEFAULT_WITH_FEATURES=	ssp
 PORTSDIR?=		/usr/ports
-LOCALBASE?=		/usr/local
+LOCALBASE?=		/usr/local2
 LINUXBASE?=		/compat/linux
 DISTDIR?=		${PORTSDIR}/distfiles
 _DISTDIR?=		${DISTDIR}/${DIST_SUBDIR}
@@ -2020,7 +2020,10 @@ DISTINFO_FILE?=		${MASTERDIR}/distinfo
 
 MAKE_FLAGS?=	-f
 MAKEFILE?=		Makefile
-MAKE_CMD?=		${BSDMAKE}
+MAKE_CMD?=		${BMAKE}
+.if ${MAKE_CMD} == ""
+MAKE_CMD = ${BSDMAKE}
+.endif
 MAKE_ENV+=		PREFIX=${PREFIX} \
 			LOCALBASE=${LOCALBASE} \
 			CC="${CC}" CFLAGS="${CFLAGS}" \
@@ -2091,7 +2094,7 @@ BUILD_FAIL_MESSAGE+=	Try to set MAKE_JOBS_UNSAFE=yes and rebuild before reportin
 .    if !make(makesum)
 FETCH_ENV?=		SSL_NO_VERIFY_PEER=1 SSL_NO_VERIFY_HOSTNAME=1
 .    endif
-FETCH_BINARY?=	/usr/bin/fetch
+FETCH_BINARY?=	/usr/local2/bin/fetch
 FETCH_ARGS?=	-Fpr
 FETCH_REGET?=	1
 FETCH_CMD?=		${FETCH_BINARY} ${FETCH_ARGS}
@@ -3112,13 +3115,13 @@ do-fetch:
 	@${SETENV} \
 			${_DO_FETCH_ENV} ${_MASTER_SITES_ENV} \
 			dp_SITE_FLAVOR=MASTER \
-			${SH} ${SCRIPTSDIR}/do-fetch.sh ${DISTFILES:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.do-fetch.sh ${DISTFILES:C/.*/'&'/}
 .      endif
 .      if defined(PATCHFILES) && !empty(PATCHFILES)
 	@${SETENV} \
 			${_DO_FETCH_ENV} ${_PATCH_SITES_ENV} \
 			dp_SITE_FLAVOR=PATCH \
-			${SH} ${SCRIPTSDIR}/do-fetch.sh ${PATCHFILES:C/:-p[0-9]//:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.do-fetch.sh ${PATCHFILES:C/:-p[0-9]//:C/.*/'&'/}
 .      endif
 .    endif
 #
@@ -3130,13 +3133,13 @@ fetch-list:
 	@${SETENV} \
 			${_DO_FETCH_ENV} ${_MASTER_SITES_ENV} \
 			dp_SITE_FLAVOR=MASTER \
-			${SH} ${SCRIPTSDIR}/do-fetch.sh ${DISTFILES:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.do-fetch.sh ${DISTFILES:C/.*/'&'/}
 .      endif
 .      if defined(PATCHFILES) && !empty(PATCHFILES)
 	@${SETENV} \
 			${_DO_FETCH_ENV} ${_PATCH_SITES_ENV} \
 			dp_SITE_FLAVOR=PATCH \
-			${SH} ${SCRIPTSDIR}/do-fetch.sh ${PATCHFILES:C/:-p[0-9]//:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.do-fetch.sh ${PATCHFILES:C/:-p[0-9]//:C/.*/'&'/}
 .      endif
 .    endif
 
@@ -3148,13 +3151,13 @@ fetch-url-list-int:
 	@${SETENV} \
 			${_DO_FETCH_ENV} ${_MASTER_SITES_ENV} \
 			dp_SITE_FLAVOR=MASTER \
-			${SH} ${SCRIPTSDIR}/do-fetch.sh ${DISTFILES:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.do-fetch.sh ${DISTFILES:C/.*/'&'/}
 .      endif
 .      if defined(PATCHFILES) && !empty(PATCHFILES)
 	@${SETENV} \
 			${_DO_FETCH_ENV} ${_PATCH_SITES_ENV} \
 			dp_SITE_FLAVOR=PATCH \
-			${SH} ${SCRIPTSDIR}/do-fetch.sh ${PATCHFILES:C/:-p[0-9]//:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.do-fetch.sh ${PATCHFILES:C/:-p[0-9]//:C/.*/'&'/}
 .      endif
 .    endif
 
@@ -4018,7 +4021,7 @@ ${deptype:tl}-depends:
 		dp_OVERLAYS="${OVERLAYS}" \
 		dp_MAKE="${MAKE}" \
 		dp_MAKEFLAGS='${.MAKEFLAGS}' \
-		${SH} ${SCRIPTSDIR}/do-depends.sh
+		${SH} ${SCRIPTSDIR}/irix.do-depends.sh
 .        endif
 .      endfor
 
@@ -4923,7 +4926,7 @@ do-config:
 	fi
 	@TMPOPTIONSFILE=$$(mktemp -t portoptions); \
 	trap "${RM} $${TMPOPTIONSFILE}; exit 1" 1 2 3 5 10 13 15; \
-	${SETENV} ${D4P_ENV} ${SH} ${SCRIPTSDIR}/dialog4ports.sh $${TMPOPTIONSFILE} || { \
+	${SETENV} ${D4P_ENV} ${SH} ${SCRIPTSDIR}/irix.dialog4ports.sh $${TMPOPTIONSFILE} || { \
 		${RM} $${TMPOPTIONSFILE}; \
 		${ECHO_CMD}; \
 		${ECHO_MSG} "===> Options unchanged"; \

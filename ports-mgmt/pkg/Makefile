@@ -32,7 +32,7 @@ OPTIONS_DEFINE=	DOCS
 EXTRA_PATCHES=	${FILESDIR}/extra-patch-docs_pkg.8
 .endif
 
-.include <bsd.port.pre.mk>
+.include <irix.port.pre.mk>
 
 .if defined(WITH_DEBUG)
 MAKE_ARGS+=	DEBUG_FLAGS="${DEBUG_FLAGS}"
@@ -85,4 +85,4 @@ post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}
 	${INSTALL_DATA} ${WRKSRC}/NEWS ${STAGEDIR}${DOCSDIR}/NEWS
 
-.include <bsd.port.post.mk>
+.include <irix.port.post.mk>

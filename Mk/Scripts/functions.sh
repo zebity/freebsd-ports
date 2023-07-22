@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 # This file for common functions used for port scripts.
 #
 # MAINTAINER: portmgr@FreeBSD.org
