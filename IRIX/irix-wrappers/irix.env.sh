@@ -74,17 +74,16 @@
 #	zebity@yahoo.com
 #
 
-echo "Env args: '$*'"
+# echo "Env args>>"
+echo "env: ""${@}"
+# echo "Env args."
+# echo "Env # args: '$#'."
 
 IRIX_ENV=/sbin/env
 
-if [ $* -eq 1 ]; then
+if [ $# -eq 0 ]; then
 	${IRIX_ENV}
 else
-
-	savargs="$*"
-
-	set -- `getopt 0iL:U:P:S:u:v $*`
 
 	output=:
 	inherit=;
@@ -95,74 +94,106 @@ else
 	name=;
 	verbose=no;
 	extraverbose=no;
-	space=" "
 
-	while :
+	set -A savargs
+	set -A keepargs
+	let "i=0"
+	let "j=0"
+	let "k=0"
+
+	for a in "${@}"
 	do
-       	 case "$1" in
-       	 --)     shift; break;;
-		-0)	output=null ;; 
-       	 -i)     inherit="-i" ;;
-       	 -L)     class=$2; shift;;
-       	 -U)     user=$2; shift;;
-       	 -P)     altpath=$2; shift;;
-       	 -S)     string=$2; shift;;
-	 -u)	name=$2; shift;;
-	 -v)	if [ ${verbose} = "no" ]; then
-			verbose=yes
-		else
-			extraverbaose=yes
-		fi
-		;;
-	 *)	break;;
-	 esac
-	 shift
+		savargs[${i}]="${a}"
+		let "i=${i} + 1"
 	done
 
-	if [ ${string} ] || [ ${user} ] || [ ${class} ]; then
-		
- 
-		if [ "${string}" ]; then
-			echo "Expand: '${string}'."
-		fi
-		if [ "${user}" ]; then
-			echo "User Lookup: '${user}'."
-		fi
-		if [ "${class}" ]; then
-			echo "Login Class Lookup: '${class}'."
-		fi
+	# echo ${savargs[@]}
 
-		# a bug in HP-UX's /bin/sh, means we need to re-set $*
-		# after any calls to add_path()
-		args="$*"
+	# just to check for valid options, don't change the actual input arguments
+	set -- `getopt 0iL:U:P:S:u:v $*`
+	# echo "Env # args: '${#}'."
 
-		# restore saved $*
-		set -- $args
+	argsz=${i};
 
-		namval=
-		utility=
+	while [ ${j} -lt ${argsz} ]
+	do
+		flag=`echo "${savargs[${j}]}" | cut -b 1`
 
-		while :
-		do
-			echo "namval: %%'$1'%%"
-			nam=`echo "$1" | cut -s -d= -f1`
-			if [ "$nam" ]; then
-				namval="${namval}""${space}""$1"
-				shift
+		if [ "${flag}" != "-" ]; then
+			break;
+		elif [ "${savargs[${j}]}" = "-0" ]; then
+			output=null
+		elif [ "${savargs[${j}]}" = "-i" ]; then
+			inherit="-i"
+		elif [ "${savargs[${j}]}" =  "-L" ]; then
+			let "j=${j} + 1" 
+			class=${savargs[${j}]}
+		elif [ "${savargs[${j}]}" = "-U" ]; then
+			let "j=${j} + 1" 
+			user=${savargs[${j}]}
+		elif [ "${savargs[${j}]}" = "-P" ]; then
+			let "j=${j} + 1" 
+			altpath=${savargs[${j}]}
+		elif [ "${savargs[${j}]}" = "-S" ]; then
+			let "j=${j} + 1" 
+			string="${savargs[${j}]}"
+		elif [ "${savargs[${j}]}" = "-u" ]; then
+			let "j=${j} + 1" 
+			name=${savarg[${j}]}
+		elif [ "${savargs[${j}]}" = "-v" ]; then
+			if [ "${verbase}" = "no" ]; then
+				verbose=yes
 			else
-				utility="$1"
-				shift
-				break;
+				extraverbose=yes
 			fi
-		done;
+		elif [ `echo "${savargs[${j}]}" | grep '^-L\(+*\)$'` ]; then
+			class=${savargs[${j}]#-L}
+		elif [ `echo "${savargs[${j}]}" | grep '^-U\(+*\)$'` ]; then
+			user=${savargs[${j}]#-U}
+		elif [ `echo "${savargs[${j}]}" | grep '^-P\(+*\)$'` ]; then
+			altpath=${savargs[${j}]#-P}
+		elif [ `echo "${savargs[${j}]}" | grep '^-S\(+*\)$'` ]; then
+			string="${savargs[${j}]#-S}"
+		elif [ `echo "${savargs[${j}]}" | grep '^-u\(+*\)$'` ]; then
+			name=${savagrs[${j}]#-S}
+		else
+			break;
+		fi
+		let "j=${j} + 1" 
+	done
 
+	let "keepsz=${#savargs[@]} - ${j}"
 
-		echo "env: ${inherit} ${namval} ${utility} $*"
+	while [ ${k} -lt ${keepsz} ]
+	do
+		keepargs[${k}]=${savargs[${j}]}
+		let "j=${j} + 1" 
+		let "k=${k} + 1" 
+	done
+ 
+	# echo "Env after setop: # keepargs: ${#keepargs[@]}"
+	# echo "Env keepargs: '" "${keepargs[@]}" "'."
 
-		${IRIX_ENV} ${inherit} ${namval} ${utility} $*
+	if [ "${string}" ] || [ "${user}" ] || [ "${class}" ]; then
+
+		if [ "${string}" ]; then
+			# echo "Expand: '${string}'."
+			SARGS="${string}"
+		fi
+#		if [ "${user}" ]; then
+#			echo "User Lookup: '${user}'."
+#		fi
+#		if [ "${class}" ]; then
+#			echo "Login Class Lookup: '${class}'."
+#		fi
+
+		# echo "env: " "$*"
+
+		${IRIX_ENV} ${inherit} ${SARGS} "${keepargs[@]}"
 	else
 
-		${IRIX_ENV} "${savargs}"
+		# echo "${IRIX_ENV}" "${inherit}" "${keepargs[@]}"
+		${IRIX_ENV} ${inherit} "${keepargs[@]}"
 	fi
 
 fi
