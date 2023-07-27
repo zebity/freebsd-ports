@@ -9,6 +9,30 @@ SGI IRIX systems.
 To keep things simple the tree has not been trimmed but if you look at the
 Description File within port you can see if it has been IRIXised.
 
+
+STARTING:
+
+To start IRIX ports you need to first bootstrap bmake and add a couple of
+IRIX wrapper scripts into bmake macro and the target bin directory
+
+To Bootstrap bmake:
+
+1 - cd /usr/ports/IRIX/bootstrap
+2 - ./irix-ports-bootstrap.sh [-d] -b /build/dir prefix=/install/dir
+    where:
+    -d == delete the bmake download and working directory once done
+    -b == download and build bmake in the /build/directory
+    prefix == the directory where you want bmake/scripts to be
+              installed in. This is likely to be the same
+              directory where the ports will install too
+              For now this defaults to: /usr/local2 
+3 - Ensure your PATH includes the target bin directory [/usr/local2/bin]
+4 - To try to build a port, ensure that the Makefile is including
+    irix.port.mk (not "bsd.port.mk") and run "bmake <target> prefix=/target
+5 - Be prepared to debug the IRIX Port tools .... ;-)
+
+OTHER:
+
 All feedback via the github repo.
 
 For information about FreeBSD ports, please see the Porter's
