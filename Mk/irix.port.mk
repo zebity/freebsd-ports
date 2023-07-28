@@ -48,7 +48,7 @@ FreeBSD_MAINTAINER=	portmgr@FreeBSD.org
 # This is the beginning of the list of all variables that need to be
 # defined in a port, listed in order that they should be included
 # to fit in with existing conventions.  (Exception: MAINTAINER actually
-# should appear after EXTRACT_ONLY and before MASTER_SITE_BACKUP).
+# should appear after EXTRACT_ONLY and before MASTER_site_BACKUP).
 #
 # These variables are used to identify your port.
 #
@@ -3222,7 +3222,7 @@ do-patch:
 			dp_SCRIPTSDIR="${SCRIPTSDIR}" \
 			dp_UNZIP_NATIVE_CMD="${UNZIP_NATIVE_CMD}" \
 			dp_XZCAT="${XZCAT}" \
-			${SH} ${SCRIPTSDIR}/do-patch.sh
+			"${SH}" ${SCRIPTSDIR}/do-patch.sh
 .    endif
 
 .    if !target(run-autotools-fixup)
@@ -3999,7 +3999,8 @@ depends: pkg-depends extract-depends patch-depends lib-depends fetch-depends bui
 .      for deptype in PKG EXTRACT PATCH FETCH BUILD LIB RUN TEST
 ${deptype:tl}-depends:
 .        if defined(${deptype}_DEPENDS) && !defined(NO_DEPENDS)
-	@${SETENV} \
+#	@${SETENV} \
+	${SETENV} \
 		dp_RAWDEPENDS="${${deptype}_DEPENDS}" \
 		dp_DEPTYPE="${deptype}_DEPENDS" \
 		dp_DEPENDS_TARGET="${DEPENDS_TARGET}" \
@@ -4021,7 +4022,7 @@ ${deptype:tl}-depends:
 		dp_OVERLAYS="${OVERLAYS}" \
 		dp_MAKE="${MAKE}" \
 		dp_MAKEFLAGS='${.MAKEFLAGS}' \
-		${SH} ${SCRIPTSDIR}/irix.do-depends.sh
+		"${SH}" ${SCRIPTSDIR}/irix.do-depends.sh
 .        endif
 .      endfor
 
@@ -4075,7 +4076,7 @@ DEPENDS-LIST= \
 			dp_PKG_INFO="${PKG_INFO}" \
 			dp_SCRIPTSDIR="${SCRIPTSDIR}" \
 			dp_OVERLAYS="${OVERLAYS}" \
-			${SH} ${SCRIPTSDIR}/depends-list.sh \
+			"${SH}" ${SCRIPTSDIR}/depends-list.sh \
 			${DEPENDS_SHOW_FLAVOR:D-f}
 
 ALL-DEPENDS-LIST=			${DEPENDS-LIST} -r ${_UNIFIED_DEPENDS:Q}

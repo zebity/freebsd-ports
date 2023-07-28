@@ -83,8 +83,8 @@ RM?=			/bin/rm -f
 RMDIR?=			/bin/rmdir
 SED?=			/usr/bin/sed
 # SETENV?=		/sbin/env
-SETENV?==		/usr/local2/bin/env
-SETENV_EXT?==		/usr/local2/bin/env
+SETENV?=		/usr/local2/bin/env
+SETENV_EXT?=		/usr/local2/bin/env
 SH?=			/bin/sh
 SORT?=			/usr/bin/sort
 STRIP_CMD?=		/usr/bin/strip

@@ -74,8 +74,9 @@
 #	zebity@yahoo.com
 #
 
+# DEBUG
 # echo "Env args>>"
-echo "env: ""${@}"
+# echo "env: ""${@}"
 # echo "Env args."
 # echo "Env # args: '$#'."
 
@@ -84,6 +85,7 @@ IRIX_ENV=/sbin/env
 if [ $# -eq 0 ]; then
 	${IRIX_ENV}
 else
+
 
 	output=;
 	inherit=;
@@ -104,6 +106,7 @@ else
 	for a in "${@}"
 	do
 		savargs[${i}]="${a}"
+#		echo "$0 - arg[${i}]: '${a}'."
 		let "i=i + 1"
 	done
 
@@ -166,7 +169,8 @@ else
 
 	while [ ${k} -lt ${keepsz} ]
 	do
-		keepargs[${k}]=${savargs[${j}]}
+#		keepargs[${k}]="\"${savargs[${j}]}\""
+		keepargs[${k}]="${savargs[${j}]}"
 		let "j=j + 1" 
 		let "k=k + 1" 
 	done
@@ -180,7 +184,7 @@ else
 			# echo "Expand: '${string}'."
 			SARGS="${string}"
 		fi
-#		if [ "${user}" ]; then
+# TODO		if [ "${user}" ]; then
 #			echo "User Lookup: '${user}'."
 #		fi
 #		if [ "${class}" ]; then
@@ -192,6 +196,14 @@ else
 		${IRIX_ENV} ${inherit} ${SARGS} "${keepargs[@]}"
 	else
 
+# DEBUG
+#		i=0
+#		for a in "${keepargs[@]}"
+#		do
+#			echo "$0 - arg[${i}]: '${a}'."
+#			let "i=i + 1"
+#		done
+#
 		# echo "${IRIX_ENV}" "${inherit}" "${keepargs[@]}"
 		${IRIX_ENV} ${inherit} "${keepargs[@]}"
 	fi
