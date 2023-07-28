@@ -32,11 +32,13 @@ for _file in "${@}"; do
 	file=${_file%%:*}
 
 	# If this files has groups
-	if [ "$_file" = "$file" ]; then
+	if [ "${_file}" = "${file}" ]; then
 		select=DEFAULT
 	else
-		select=$(echo "${_file##*:}" | sed -e 's/,/ /g')
+		select=`echo "${_file##*:}" | sed -e 's/,/ /g'`
 	fi
+
+	echo "DBG>> selected file: '${select}'."
 
 	filebasename=${file##*/}
 	if [ -n "${dp_FORCE_FETCH_ALL}" ]; then
@@ -115,16 +117,20 @@ for _file in "${@}"; do
 	esac
 	sites_remaining=0
 	if [ -n "${dp_RANDOMIZE_SITES}" ]; then
-		sites="$(${SORTED_MASTER_SITES_CMD_TMP} | ${dp_RANDOMIZE_SITES})"
+#		sites="`${SORTED_MASTER_SITES_CMD_TMP} | ${dp_RANDOMIZE_SITES}`"
+		sites="`${SORTED_MASTER_SITES_CMD_TMP} | ${dp_RANDOMIZE_SITES}`"
 	else
-		sites="$(${SORTED_MASTER_SITES_CMD_TMP})"
+		sites="`${SORTED_MASTER_SITES_CMD_TMP}`"
 	fi
+
+	echo "DBG>> sites: '${sites}'."
+
 	for site in ${sites}; do
-		sites_remaining=$((sites_remaining + 1))
+		let "sites_remaining=sites_remaining + 1"
 	done
 	for site in ${sites}; do
-		sites_remaining=$((sites_remaining - 1))
-		CKSIZE=$(distinfo_data SIZE "${full_file}")
+		let "sites_remaining=sites_remaining - 1"
+		CKSIZE=`distinfo_data SIZE "${full_file}"`
 		# There is a lot of escaping, but the " needs to survive echo/eval.
 		case ${file} in
 			*/*)
@@ -147,6 +153,9 @@ for _file in "${@}"; do
 			_fetch_cmd="${_fetch_cmd} -S ${CKSIZE}"
 		fi
 		_fetch_cmd="${_fetch_cmd} ${args} ${dp_FETCH_AFTER_ARGS}"
+
+		echo "DBG>> _fetch_cmd: '${_fetch_cmd}'."
+
 		case ${dp_TARGET} in
 			do-fetch|makesum)
 				${dp_ECHO_MSG} "=> Attempting to fetch ${site}${file}"
@@ -164,7 +173,7 @@ for _file in "${@}"; do
 				fi
 				;;
 			fetch-list)
-				echo -n "env $(escape "${_fetch_cmd}") || "
+				echo -n "env `escape "${_fetch_cmd}"` || "
 				;;
 			fetch-url-list-int)
 				echo ${args}
