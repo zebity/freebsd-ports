@@ -138,7 +138,7 @@
 
 set -- `getopt 146AaB:c:dFf:h:i:lMmN:o:PpqRrS:sT:Uvw: $*`
 
-bytes=:
+bytes=;
 one=no
 dir=;
 file=;

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # NAME:
 #	irix.env.sh - wrapper for FreeBSD env command
@@ -85,7 +85,7 @@ if [ $# -eq 0 ]; then
 	${IRIX_ENV}
 else
 
-	output=:
+	output=;
 	inherit=;
 	user=;
 	class=;
@@ -104,13 +104,13 @@ else
 	for a in "${@}"
 	do
 		savargs[${i}]="${a}"
-		let "i=${i} + 1"
+		let "i=i + 1"
 	done
 
 	# echo ${savargs[@]}
 
 	# just to check for valid options, don't change the actual input arguments
-	set -- `getopt 0iL:U:P:S:u:v $*`
+	# set -- `getopt 0iL:U:P:S:u:v $*`
 	# echo "Env # args: '${#}'."
 
 	argsz=${i};
@@ -126,19 +126,19 @@ else
 		elif [ "${savargs[${j}]}" = "-i" ]; then
 			inherit="-i"
 		elif [ "${savargs[${j}]}" =  "-L" ]; then
-			let "j=${j} + 1" 
+			let "j=j + 1" 
 			class=${savargs[${j}]}
 		elif [ "${savargs[${j}]}" = "-U" ]; then
-			let "j=${j} + 1" 
+			let "j=j + 1" 
 			user=${savargs[${j}]}
 		elif [ "${savargs[${j}]}" = "-P" ]; then
-			let "j=${j} + 1" 
+			let "j=j + 1" 
 			altpath=${savargs[${j}]}
 		elif [ "${savargs[${j}]}" = "-S" ]; then
-			let "j=${j} + 1" 
+			let "j=j + 1" 
 			string="${savargs[${j}]}"
 		elif [ "${savargs[${j}]}" = "-u" ]; then
-			let "j=${j} + 1" 
+			let "j=j + 1" 
 			name=${savarg[${j}]}
 		elif [ "${savargs[${j}]}" = "-v" ]; then
 			if [ "${verbase}" = "no" ]; then
@@ -159,16 +159,16 @@ else
 		else
 			break;
 		fi
-		let "j=${j} + 1" 
+		let "j=j + 1" 
 	done
 
-	let "keepsz=${#savargs[@]} - ${j}"
+	let "keepsz=${#savargs[@]} - j"
 
 	while [ ${k} -lt ${keepsz} ]
 	do
 		keepargs[${k}]=${savargs[${j}]}
-		let "j=${j} + 1" 
-		let "k=${k} + 1" 
+		let "j=j + 1" 
+		let "k=k + 1" 
 	done
  
 	# echo "Env after setop: # keepargs: ${#keepargs[@]}"
