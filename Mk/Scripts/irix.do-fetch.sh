@@ -1,7 +1,7 @@
 #!/bin/sh -x
 #
 # MAINTAINER: portmgr@FreeBSD.org
-
+#
 set -e
 # set -o pipefail
 
@@ -108,7 +108,8 @@ for _file in "${@}"; do
 		fi
 	done
 	___MASTER_SITES_TMP=
-	SORTED_MASTER_SITES_CMD_TMP="echo ${dp_MASTER_SITE_OVERRIDE} $(echo -n "${__MASTER_SITES_TMP}" | awk "${dp_MASTER_SORT_AWK}") ${dp_MASTER_SITE_BACKUP}"
+#	SORTED_MASTER_SITES_CMD_TMP="echo ${dp_MASTER_SITE_OVERRIDE} $(echo -n "${__MASTER_SITES_TMP}" | awk "${dp_MASTER_SORT_AWK}") ${dp_MASTER_SITE_BACKUP}"
+	SORTED_MASTER_SITES_CMD_TMP="echo ${dp_MASTER_SITE_OVERRIDE} `echo -n "${__MASTER_SITES_TMP}" | awk "${dp_MASTER_SORT_AWK}"` ${dp_MASTER_SITE_BACKUP}"
 	case ${dp_TARGET} in
 		fetch-list)
 			echo -n "mkdir -p ${dp_DISTDIR} && "
@@ -160,7 +161,8 @@ for _file in "${@}"; do
 			do-fetch|makesum)
 				${dp_ECHO_MSG} "=> Attempting to fetch ${site}${file}"
 				if ${SETENV_EXT} -S "${dp_FETCH_ENV}" ${_fetch_cmd}; then
-					actual_size=$(stat -f %z "${file}")
+#					actual_size=$(stat -f %z "${file}")
+					actual_size=`stat -qs "${file}"`
 					if [ -n "${dp_DISABLE_SIZE}" ] || [ -z "${CKSIZE}" ] || [ "${actual_size}" -eq "${CKSIZE}" ]; then
 						continue 2
 					else

@@ -197,7 +197,7 @@ done
 # file="$files $1"
 # shift
 
-# DBG echo "files: '${files}'"
+echo "IRIX fetch files: '${files}'"
 
 for f in $files
 do
@@ -220,9 +220,10 @@ do
 			echo "Optimistic change to: '${gf}'."
 		fi
 		${WGET} ${gf}
-		if [ $? -eq 0 ] && [ "${one}" = "yes" ]; then
+		res=$?
+		if [ ${res} -eq 0 ] && [ "${one}" = "yes" ]; then
 			return 0
 		fi
 	fi
 done
-exit 0 
+return ${res}
