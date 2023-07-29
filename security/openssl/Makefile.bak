@@ -3,8 +3,7 @@ PORTVERSION=	1.1.1u
 PORTEPOCH=	1
 CATEGORIES=	security devel
 MASTER_SITES=	https://www.openssl.org/source/ \
-		ftp://ftp.cert.dfn.de/pub/tools/net/openssl/source/ \
-		http://artfiles.org/openssl.org/source/
+		ftp://ftp.cert.dfn.de/pub/tools/net/openssl/source/
 
 MAINTAINER=	brnrd@FreeBSD.org
 COMMENT=	TLSv1.3 capable SSL and crypto library
@@ -117,7 +116,7 @@ SHARED_USE=		ldconfig=yes
 SSL3_CONFIGURE_ON+=	enable-ssl3-method
 ZLIB_CONFIGURE_ON=	zlib-dynamic
 
-.include <irix.port.pre.mk>
+.include <bsd.port.pre.mk>
 .if ${PREFIX} == /usr
 IGNORE=	the OpenSSL port can not be installed over the base version
 .endif
@@ -167,4 +166,4 @@ post-install-MAN3-on:
 	( cd ${STAGEDIR}/${PREFIX} ; ${FIND} man/man3 man/man7 -not -type d ) | \
 		${SED} 's/$$/.gz/' >>${TMPPLIST}
 
-.include <irix.port.post.mk>
+.include <bsd.port.post.mk>

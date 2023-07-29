@@ -38,7 +38,7 @@ for _file in "${@}"; do
 		select=`echo "${_file##*:}" | sed -e 's/,/ /g'`
 	fi
 
-	echo "DBG>> selected file: '${select}'."
+#	echo "DBG>> selected file: '${select}'."
 
 	filebasename=${file##*/}
 	if [ -n "${dp_FORCE_FETCH_ALL}" ]; then
@@ -124,7 +124,7 @@ for _file in "${@}"; do
 		sites="`${SORTED_MASTER_SITES_CMD_TMP}`"
 	fi
 
-	echo "DBG>> sites: '${sites}'."
+#	echo "DBG>> sites: '${sites}'."
 
 	for site in ${sites}; do
 		let "sites_remaining=sites_remaining + 1"
@@ -155,7 +155,7 @@ for _file in "${@}"; do
 		fi
 		_fetch_cmd="${_fetch_cmd} ${args} ${dp_FETCH_AFTER_ARGS}"
 
-		echo "DBG>> _fetch_cmd: '${_fetch_cmd}'."
+#		echo "DBG>> _fetch_cmd: '${_fetch_cmd}'."
 
 		case ${dp_TARGET} in
 			do-fetch|makesum)

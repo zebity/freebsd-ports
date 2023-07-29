@@ -83,7 +83,7 @@ find_file_path()
 find_lib()
 {
 	echo -n "===>   ${dp_PKGNAME} depends on shared library: $1"
-	libfile=$(env -i PATH="${PATH}" LIB_DIRS="${dp_LIB_DIRS}" LOCALBASE="${dp_LOCALBASE}" ${dp_SH} ${dp_SCRIPTSDIR}/find-lib.sh $1)
+	libfile=`env -i PATH="${PATH}" LIB_DIRS="${dp_LIB_DIRS}" LOCALBASE="${dp_LOCALBASE}" ${dp_SH} ${dp_SCRIPTSDIR}/find-lib.sh $1`
 	echo "************ ${libfile} ***************"
 	if [ -z "${libfile}" ]; then
 		echo " - not found"

@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # NAME:
 #	irix.env.sh - wrapper for FreeBSD env command

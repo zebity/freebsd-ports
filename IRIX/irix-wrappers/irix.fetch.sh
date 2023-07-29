@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # NAME:
 #	irix.fetch.sh - optimistic wrapper for FreeBSD fetch command
@@ -203,10 +203,11 @@ for f in $files
 do
 	b=`basename $f`
 	if [ -f $b ]; then
-		echo "Skiping as file alread exists: '$b'."
+		echo "Skipping as file already exists: '$b'."
 	else
 		https=`echo "${f}" | cut -b 1-6`
 		http=`echo "${f}" | cut -b 1-5`
+		ftp=`echo "${f}" | cut -b 1-4`
 		if [ "${https}" = "https:" ]; then
 			l=${#f}
 		 	r=`echo "${f}" | cut -b 7-${l}`
@@ -215,6 +216,9 @@ do
 		elif [ "${http}" = "http:" ]; then
 			gf=${f}
 			echo "Get with http: '${gf}'."
+		elif [ "${ftp}" = "ftp:" ]; then
+			gf=${f}
+			echo "Get with ftp: '${gf}'."
 		else
 			gf="http://"${f}
 			echo "Optimistic change to: '${gf}'."

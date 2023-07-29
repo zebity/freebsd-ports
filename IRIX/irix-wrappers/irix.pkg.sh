@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # NAME:
 #	irix.pkg.sh - optimistic wrapper for FreeBSD pkg command

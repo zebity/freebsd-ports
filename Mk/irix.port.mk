@@ -2148,7 +2148,7 @@ PATCH_ARGS+=	--suffix .orig
 PATCH_DIST_ARGS+=	--suffix .orig
 .    endif
 
-TAR?=	/usr/bin/tar
+TAR?=	/usr/freeware/bin/tar
 
 # EXTRACT_SUFX is defined in .pre.mk section
 EXTRACT_CMD?=	${TAR}
@@ -3183,7 +3183,7 @@ clean-wrkdir:
 .    if !target(do-extract)
 do-extract: ${EXTRACT_WRKDIR}
 	@for file in ${EXTRACT_ONLY}; do \
-		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS});\
+		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS}`;\
 		then \
 			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
 			exit 1; \
@@ -3257,8 +3257,8 @@ do-configure:
 		  ${SCRIPTDIR}/configure; \
 	fi
 .      if defined(GNU_CONFIGURE)
-	@CONFIG_GUESS_DIRS=$$(${FIND} ${WRKDIR} -name config.guess -o -name config.sub \
-		| ${XARGS} -n 1 ${DIRNAME}); \
+	@CONFIG_GUESS_DIRS=$`${FIND} ${WRKDIR} -name config.guess -o -name config.sub \
+		| ${XARGS} -n 1 ${DIRNAME}`; \
 	for _D in $${CONFIG_GUESS_DIRS}; do \
 		${RM} $${_D}/config.guess; \
 		${CP} ${TEMPLATES}/config.guess $${_D}/config.guess; \
@@ -3310,7 +3310,8 @@ check-conflicts: check-build-conflicts check-install-conflicts
 .    if !target(check-build-conflicts)
 check-build-conflicts:
 .      if ( defined(CONFLICTS) || defined(CONFLICTS_BUILD) ) && !defined(DISABLE_CONFLICTS) && !defined(DEFER_CONFLICTS_CHECK)
-	@conflicts_with=$$(${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} 2>/dev/null || : ; ) ; \
+	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} 2>/dev/null || : ; ` ; \
+# ????	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} 2>/dev/null || : ; ` ; \
 	if [ -n "$${conflicts_with}" ]; then \
 		${ECHO_MSG}; \
 		${ECHO_MSG} "===>  ${PKGNAME} conflicts with installed package(s): "; \
@@ -3329,7 +3330,7 @@ check-build-conflicts:
 CONFLICT_WARNING_WAIT?=	10
 identify-install-conflicts:
 .      if ( defined(CONFLICTS) || defined(CONFLICTS_INSTALL) ) && !defined(DISABLE_CONFLICTS)
-	@conflicts_with=$$(${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ) ; \
+	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ` ; \
 	if [ -n "$${conflicts_with}" ]; then \
 		${ECHO_MSG}; \
 		${ECHO_MSG} "===>  ${PKGNAME} conflicts with installed package(s): "; \
@@ -3348,7 +3349,7 @@ identify-install-conflicts:
 check-install-conflicts:
 .      if ( defined(CONFLICTS) || defined(CONFLICTS_INSTALL) || ( defined(CONFLICTS_BUILD) && defined(DEFER_CONFLICTS_CHECK) ) ) && !defined(DISABLE_CONFLICTS)
 .        if defined(DEFER_CONFLICTS_CHECK)
-	@conflicts_with=$$(${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ) ; \
+	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ` ; \
 	if [ -n "$${conflicts_with}" ]; then \
 		${ECHO_MSG}; \
 		${ECHO_MSG} "===>  ${PKGNAME} conflicts with installed package(s): "; \
@@ -3360,7 +3361,7 @@ check-install-conflicts:
 		exit 1; \
 	fi
 .        else
-	@conflicts_with=$$(${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ) ; \
+	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ` ; \
 	if [ -n "$${conflicts_with}" ]; then \
 		${ECHO_MSG}; \
 		${ECHO_MSG} "===>  ${PKGNAME} conflicts with installed package(s): "; \
@@ -3565,7 +3566,7 @@ install-ldconfig-file:
 .      if !target(fixup-lib-pkgconfig)
 fixup-lib-pkgconfig:
 	@if [ -d ${STAGEDIR}${PREFIX}/lib/pkgconfig ]; then \
-		if [ -z "$$(${FIND} ${STAGEDIR}${PREFIX}/lib/pkgconfig -maxdepth 0 -empty)" ]; then \
+		if [ -z "$`${FIND} ${STAGEDIR}${PREFIX}/lib/pkgconfig -maxdepth 0 -empty`" ]; then \
 			if [ -n "${DEVELOPER:Dyes}" ]; then \
 				${ECHO_MSG} "===>   File(s) found in lib/pkgconfig while correct path is libdata/pkgconfig"; \
 				${ECHO_MSG} "       Applying fix but consider using USES= pathfix or adjust install path"; \
@@ -3772,8 +3773,8 @@ deinstall-all:
 .      else
 	@${ECHO_MSG} "===>  Deinstalling for ${PKGORIGIN}"
 	@deinstall_names=`${PKG_INFO} -q -O ${PKGORIGIN}`; \
-	for oldpkgorigin in $$(${GREP} "|${PKGORIGIN}|" ${PORTSDIR}/MOVED | ${CUT} -f 1 -d '|' | ${SORT} -u); do \
-		deinstall_names="$${deinstall_names} $$(${PKG_INFO} -q -O $${oldpkgorigin})"; \
+	for oldpkgorigin in $`${GREP} "|${PKGORIGIN}|" ${PORTSDIR}/MOVED | ${CUT} -f 1 -d '|' | ${SORT} -u`; do \
+		deinstall_names="$${deinstall_names} $`${PKG_INFO} -q -O $${oldpkgorigin}`"; \
 	done; \
 	if [ -n "$${deinstall_names}" ]; then \
 		for d in $${deinstall_names}; do \
@@ -3887,7 +3888,8 @@ delete-distfiles-list:
 	@${ECHO_CMD} "# ${PKGNAME}"
 	@if [ "X${RESTRICTED_FILES}" != "X" ]; then \
 		for file in ${RESTRICTED_FILES}; do \
-			${ECHO_CMD} "[ -f ${_DISTDIR}/$$file ] && (${ECHO_CMD} deleting ${_DISTDIR}/$$file; ${RM} ${_DISTDIR}/$$file)"; \
+			${ECHO_CMD} "[ -f ${_DISTDIR}/$$file ] && (${ECHO_CMD} deleting ${_DISTDIR}/$$file; ${RM} ${_DISTDIR}/$$file`"; \
+# ????			${ECHO_CMD} "[ -f ${_DISTDIR}/${file} ] && (${ECHO_CMD} deleting ${_DISTDIR}/${file}; ${RM} ${_DISTDIR}/${file}`"; \
 			dir=$${file%/*}; \
 			if [ "$${dir}" != "$${file}" ]; then \
 				${ECHO_CMD} "(cd ${_DISTDIR} && ${RMDIR} -p $${dir} 2>/dev/null)"; \
@@ -3946,7 +3948,7 @@ checksum: fetch
 			dp_SCRIPTSDIR='${SCRIPTSDIR}' \
 			dp_DISABLE_SIZE='${DISABLE_SIZE}' \
 			dp_NO_CHECKSUM='${NO_CHECKSUM}' \
-			${SH} ${SCRIPTSDIR}/checksum.sh ${_CKSUMFILES:C/.*/'&'/}
+			${SH} ${SCRIPTSDIR}/irix.checksum.sh ${_CKSUMFILES:C/.*/'&'/}
 .      endif
 .    endif
 
@@ -4091,14 +4093,14 @@ CLEAN-DEPENDS-LIMITED-LIST=	${DEPENDS-LIST} -w ${_UNIFIED_DEPENDS:Q}
 
 .    if !target(clean-depends)
 clean-depends:
-	@for dir in $$(${CLEAN-DEPENDS-LIST}); do \
+	@for dir in $`${CLEAN-DEPENDS-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
 .    endif
 
 .    if !target(limited-clean-depends)
 limited-clean-depends:
-	@for dir in $$(${CLEAN-DEPENDS-LIMITED-LIST}); do \
+	@for dir in $`${CLEAN-DEPENDS-LIMITED-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
 .    endif
@@ -4106,7 +4108,7 @@ limited-clean-depends:
 .    if !target(deinstall-depends)
 deinstall-depends:
 	@recursive_cmd="deinstall"; \
-		recursive_dirs="$$(${DEINSTALL-DEPENDS-FLAVORS-LIST})"; \
+		recursive_dirs="$`${DEINSTALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
@@ -4122,14 +4124,14 @@ fetch-specials:
 fetch-recursive:
 	@${ECHO_MSG} "===> Fetching all distfiles for ${PKGNAME} and dependencies"
 	@recursive_cmd="fetch"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
 .    if !target(fetch-recursive-list)
 fetch-recursive-list:
 	@recursive_cmd="fetch-list"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
@@ -4159,7 +4161,7 @@ FETCH_LIST?=	for i in $$deps; do \
 			else	\
 				continue;	\
 			fi;;	\
-		*) if [ -d ${PKG_DBDIR}/$$(cd $$dir; ${MAKE} -V PKGNAME) ]; then \
+		*) if [ -d ${PKG_DBDIR}/$`cd $$dir; ${MAKE} -V PKGNAME` ]; then \
 				continue;	\
 			fi;;	\
 		esac;	\
@@ -4196,7 +4198,7 @@ fetch-required-list: fetch-list
 checksum-recursive:
 	@${ECHO_MSG} "===> Fetching and checking checksums for ${PKGNAME} and dependencies"
 	@recursive_cmd="checksum"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
@@ -4228,8 +4230,8 @@ package-depends-list:
 _LIB_RUN_DEPENDS=	${LIB_DEPENDS} ${RUN_DEPENDS}
 PACKAGE-DEPENDS-LIST?= \
 	if [ "${CHILD_DEPENDS}" ]; then \
-		installed=$$(${PKG_INFO} -qO ${PKGORIGIN} 2>/dev/null || \
-			${TRUE}); \
+		installed=$`${PKG_INFO} -qO ${PKGORIGIN} 2>/dev/null || \
+			${TRUE}`; \
 		if [ "$$installed" ]; then \
 			break; \
 		fi; \
@@ -4253,12 +4255,12 @@ PACKAGE-DEPENDS-LIST?= \
 		/*) ;; \
 		*) dir=${PORTSDIR}/$$dir ;; \
 		esac ; \
-		dir=$$(${REALPATH} $$dir); \
+		dir=$`${REALPATH} $$dir`; \
 		if [ -d $$dir ]; then \
 			case $$checked in	\
 			$$dir|$$dir\ *|*\ $$dir|*\ $$dir\ *) continue;;	\
 			esac;	\
-			childout=$$(cd $$dir; ${SETENV} FLAVOR=$${flavor} ${MAKE} CHILD_DEPENDS=yes PARENT_CHECKED="$$checked" package-depends-list); \
+			childout=$`cd $$dir; ${SETENV} FLAVOR=$${flavor} ${MAKE} CHILD_DEPENDS=yes PARENT_CHECKED="$$checked" package-depends-list`; \
 			set -- $$childout; \
 			childdir=""; \
 			while [ $$\# != 0 ]; do \
@@ -4333,28 +4335,28 @@ actual-package-depends:
 
 package-recursive: package
 	@recursive_cmd="package-noinstall"; \
-	    recursive_dirs="$$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="$`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 
 # Show missing dependencies
 missing:
-	@for dir in $$(${MISSING-DEPENDS-LIST}); do \
+	@for dir in $`${MISSING-DEPENDS-LIST}`; do \
 		echo $${dir#${PORTSDIR}/}; \
 	done
 
 # Show missing dependencies by name
 missing-packages:
-	@_packages=$$(${PKG_INFO} -aq); \
-	for dir in $$(${ALL-DEPENDS-LIST}); do \
-		_p=$$(cd $$dir; ${MAKE} -VPKGNAME); \
-		if ! $$(${ECHO_CMD} $${_packages} | ${GREP} -q $${_p}); then \
+	@_packages=$`${PKG_INFO} -aq`; \
+	for dir in $`${ALL-DEPENDS-LIST}`; do \
+		_p=$`cd $$dir; ${MAKE} -VPKGNAME`; \
+		if ! $`${ECHO_CMD} $${_packages} | ${GREP} -q $${_p}`; then \
 			${ECHO_CMD} $${_p}; \
 		fi; \
 	done
 
 # Install missing dependencies from package
 install-missing-packages:
-	@_dirs=$$(${MISSING-DEPENDS-LIST}); \
+	@_dirs=$`${MISSING-DEPENDS-LIST}`; \
 	${ECHO_CMD} "$${_dirs}" | ${SED} "s%${PORTSDIR}/%%g" | \
 		${SU_CMD} "${XARGS} -o ${PKG_BIN} install -A"
 
@@ -4419,21 +4421,21 @@ readme:
 
 ${.CURDIR}/README.html:
 	@${ECHO_MSG} "===>   Creating README.html for ${PKGNAME}"
-	@${SED} -e 's|%%PORT%%|'$$(${ECHO_CMD} ${.CURDIR} | \
-							  ${SED} -e 's|.*/\([^/]*/[^/]*\)$$|\1|')'|g' \
+	@${SED} -e 's|%%PORT%%|'$`${ECHO_CMD} ${.CURDIR} | \
+							  ${SED} -e 's|.*/\([^/]*/[^/]*\)$$|\1|'`'|g' \
 			-e 's|%%PKG%%|${PKGNAME}|g' \
-			-e 's|%%COMMENT%%|'"$$(${ECHO_CMD} ${COMMENT:Q})"'|' \
+			-e 's|%%COMMENT%%|'"$`${ECHO_CMD} ${COMMENT:Q}`"'|' \
 			-e '/%%COMMENT%%/d' \
-			-e 's|%%DESCR%%|'"$$(${ECHO_CMD} ${DESCR} | \
-								 ${SED} -e 's|${.CURDIR}/||')"'|' \
-			-e 's|%%EMAIL%%|'"$$(${ECHO_CMD} "${MAINTAINER}" | \
-								 ${SED} -e 's/([^)]*)//;s/.*<//;s/>.*//')"'|g' \
+			-e 's|%%DESCR%%|'"$`${ECHO_CMD} ${DESCR} | \
+								 ${SED} -e 's|${.CURDIR}/||'`"'|' \
+			-e 's|%%EMAIL%%|'"$`${ECHO_CMD} "${MAINTAINER}" | \
+								 ${SED} -e 's/([^)]*)//;s/.*<//;s/>.*//'`"'|g' \
 			-e 's|%%MAINTAINER%%|${MAINTAINER}|g' \
-			-e 's|%%WEBSITE%%|'"$$(cd ${.CURDIR} && eval ${MAKE} pretty-print-www-site)"'|' \
-			-e 's|%%BUILD_DEPENDS%%|'"$$(cd ${.CURDIR} && eval ${MAKE} pretty-print-build-depends-list)"'|' \
-			-e 's|%%RUN_DEPENDS%%|'"$$(cd ${.CURDIR} && eval ${MAKE} pretty-print-run-depends-list)"'|' \
-			-e 's|%%TOP%%|'"$$(${ECHO_CMD} ${CATEGORIES} | \
-							   ${SED} -e 's| .*||' -e 's|[^/]*|..|g')"'/..|' \
+			-e 's|%%WEBSITE%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-www-site`"'|' \
+			-e 's|%%BUILD_DEPENDS%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-build-depends-list`"'|' \
+			-e 's|%%RUN_DEPENDS%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-run-depends-list`"'|' \
+			-e 's|%%TOP%%|'"$`${ECHO_CMD} ${CATEGORIES} | \
+							   ${SED} -e 's| .*||' -e 's|[^/]*|..|g'`"'/..|' \
 		${TEMPLATES}/README.port >> ${.TARGET}
 
 # The following two targets require an up-to-date INDEX in ${PORTSDIR}
@@ -4587,7 +4589,7 @@ check-man: stage
 	done ; \
 	err=0 ; \
 	for dir in $$mdirs; do \
-		for f in $$(find $$dir -name "*.gz"); do \
+		for f in $`find $$dir -name "*.gz"`; do \
 			${ECHO_CMD} "===> Checking $${f##*/}" ; \
 			gunzip -c $$f | mandoc -Tlint -Werror && continue ; \
 			err=1 ; \
@@ -4611,7 +4613,7 @@ compress-man:
 		${FIND} $$dir -type f \! -name "*.gz" \! -links 1 -exec ${STAT} -f '%i' {} \; | \
 			${SORT} -u | while read inode ; do \
 				unset ref ; \
-				for f in $$(${FIND} $$dir -type f -inum $${inode} -print); do \
+				for f in $`${FIND} $$dir -type f -inum $${inode} -print`; do \
 					if [ -z $$ref ]; then \
 						ref=$${f}.gz ; \
 						${GZIP_CMD} $${f} ; \
@@ -4622,7 +4624,7 @@ compress-man:
 				done ; \
 			done ; \
 		${FIND} $$dir -type l \! -name "*.gz" | while read link ; do \
-				${LN} -sf $$(readlink $$link).gz $$link.gz ;\
+				${LN} -sf $`readlink $$link`.gz $$link.gz ;\
 				${RM} $$link ; \
 		done; \
 	done
@@ -4925,7 +4927,7 @@ do-config:
 	${MKDIR} $${optionsdir} 2> /dev/null || \
 	(${ECHO_MSG} "===> Cannot create $${optionsdir}, check permissions"; exit 1) ; \
 	fi
-	@TMPOPTIONSFILE=$$(mktemp -t portoptions); \
+	@TMPOPTIONSFILE=$`mktemp -t portoptions`; \
 	trap "${RM} $${TMPOPTIONSFILE}; exit 1" 1 2 3 5 10 13 15; \
 	${SETENV} ${D4P_ENV} ${SH} ${SCRIPTSDIR}/irix.dialog4ports.sh $${TMPOPTIONSFILE} || { \
 		${RM} $${TMPOPTIONSFILE}; \
@@ -4938,9 +4940,9 @@ do-config:
 		${ECHO_MSG} "===> No user-specified options to save for ${PKGNAME}"; \
 		exit 0; \
 	fi; \
-	SELOPTIONS=$$(${CAT} $${TMPOPTIONSFILE}); \
+	SELOPTIONS=$`${CAT} $${TMPOPTIONSFILE}`; \
 	${RM} $${TMPOPTIONSFILE}; \
-	TMPOPTIONSFILE=$$(mktemp -t portoptions); \
+	TMPOPTIONSFILE=$`mktemp -t portoptions`; \
 	trap "${RM} $${TMPOPTIONSFILE}; exit 1" 1 2 3 5 10 13 15; \
 	${ECHO_CMD} "# This file is auto-generated by 'make config'." > $${TMPOPTIONSFILE}; \
 	${ECHO_CMD} "# Options for ${PKGNAME}" >> $${TMPOPTIONSFILE}; \
@@ -4979,7 +4981,7 @@ config:
 config-recursive:
 	@${ECHO_MSG} "===> Setting user-specified options for ${PKGNAME} and dependencies";
 	@recursive_cmd="config-conditional"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif # config-recursive
 
@@ -5035,7 +5037,7 @@ showconfig: check-config
 showconfig-recursive:
 	@${ECHO_MSG} "===> The following configuration options are available for ${PKGNAME} and its dependencies";
 	@recursive_cmd="showconfig"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif # showconfig-recursive
 
@@ -5062,7 +5064,7 @@ rmconfig:
 rmconfig-recursive:
 	@${ECHO_MSG} "===> Removing user-specified options for ${PKGNAME} and its dependencies";
 	@recursive_cmd="rmconfig"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $$(${ALL-DEPENDS-FLAVORS-LIST})"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif # rmconfig-recursive
 
