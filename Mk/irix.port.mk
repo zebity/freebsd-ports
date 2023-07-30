@@ -3183,7 +3183,7 @@ clean-wrkdir:
 .    if !target(do-extract)
 do-extract: ${EXTRACT_WRKDIR}
 	@for file in ${EXTRACT_ONLY}; do \
-		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS}`;\
+		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS});\
 		then \
 			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
 			exit 1; \
@@ -3222,7 +3222,7 @@ do-patch:
 			dp_SCRIPTSDIR="${SCRIPTSDIR}" \
 			dp_UNZIP_NATIVE_CMD="${UNZIP_NATIVE_CMD}" \
 			dp_XZCAT="${XZCAT}" \
-			"${SH}" ${SCRIPTSDIR}/do-patch.sh
+			${SH} ${SCRIPTSDIR}/do-patch.sh
 .    endif
 
 .    if !target(run-autotools-fixup)
@@ -3349,7 +3349,7 @@ identify-install-conflicts:
 check-install-conflicts:
 .      if ( defined(CONFLICTS) || defined(CONFLICTS_INSTALL) || ( defined(CONFLICTS_BUILD) && defined(DEFER_CONFLICTS_CHECK) ) ) && !defined(DISABLE_CONFLICTS)
 .        if defined(DEFER_CONFLICTS_CHECK)
-	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ` ; \
+	@conflicts_with=$$(${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_BUILD:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ) ; \
 	if [ -n "$${conflicts_with}" ]; then \
 		${ECHO_MSG}; \
 		${ECHO_MSG} "===>  ${PKGNAME} conflicts with installed package(s): "; \
@@ -3361,7 +3361,7 @@ check-install-conflicts:
 		exit 1; \
 	fi
 .        else
-	@conflicts_with=$`${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ` ; \
+	@conflicts_with=$$(${PKG_QUERY} -ge "%n != ${PKGBASE}" "%n-%v" ${CONFLICTS:C/.+/'&'/} ${CONFLICTS_INSTALL:C/.+/'&'/} 2>/dev/null || : ; ) ; \
 	if [ -n "$${conflicts_with}" ]; then \
 		${ECHO_MSG}; \
 		${ECHO_MSG} "===>  ${PKGNAME} conflicts with installed package(s): "; \
@@ -3774,7 +3774,7 @@ deinstall-all:
 	@${ECHO_MSG} "===>  Deinstalling for ${PKGORIGIN}"
 	@deinstall_names=`${PKG_INFO} -q -O ${PKGORIGIN}`; \
 	for oldpkgorigin in $`${GREP} "|${PKGORIGIN}|" ${PORTSDIR}/MOVED | ${CUT} -f 1 -d '|' | ${SORT} -u`; do \
-		deinstall_names="$${deinstall_names} $`${PKG_INFO} -q -O $${oldpkgorigin}`"; \
+		deinstall_names="$${deinstall_names} ${`${PKG_INFO} -q -O $${oldpkgorigin}`"; \
 	done; \
 	if [ -n "$${deinstall_names}" ]; then \
 		for d in $${deinstall_names}; do \
@@ -3888,7 +3888,7 @@ delete-distfiles-list:
 	@${ECHO_CMD} "# ${PKGNAME}"
 	@if [ "X${RESTRICTED_FILES}" != "X" ]; then \
 		for file in ${RESTRICTED_FILES}; do \
-			${ECHO_CMD} "[ -f ${_DISTDIR}/$$file ] && (${ECHO_CMD} deleting ${_DISTDIR}/$$file; ${RM} ${_DISTDIR}/$$file`"; \
+			${ECHO_CMD} "[ -f ${_DISTDIR}/$$file ] && (${ECHO_CMD} deleting ${_DISTDIR}/$$file; ${RM} ${_DISTDIR}/$$file)"; \
 # ????			${ECHO_CMD} "[ -f ${_DISTDIR}/${file} ] && (${ECHO_CMD} deleting ${_DISTDIR}/${file}; ${RM} ${_DISTDIR}/${file}`"; \
 			dir=$${file%/*}; \
 			if [ "$${dir}" != "$${file}" ]; then \
@@ -4024,7 +4024,7 @@ ${deptype:tl}-depends:
 		dp_OVERLAYS="${OVERLAYS}" \
 		dp_MAKE="${MAKE}" \
 		dp_MAKEFLAGS='${.MAKEFLAGS}' \
-		"${SH}" ${SCRIPTSDIR}/irix.do-depends.sh
+		${SH} ${SCRIPTSDIR}/irix.do-depends.sh
 .        endif
 .      endfor
 
@@ -4078,7 +4078,7 @@ DEPENDS-LIST= \
 			dp_PKG_INFO="${PKG_INFO}" \
 			dp_SCRIPTSDIR="${SCRIPTSDIR}" \
 			dp_OVERLAYS="${OVERLAYS}" \
-			"${SH}" ${SCRIPTSDIR}/depends-list.sh \
+			${SH} ${SCRIPTSDIR}/irix.depends-list.sh \
 			${DEPENDS_SHOW_FLAVOR:D-f}
 
 ALL-DEPENDS-LIST=			${DEPENDS-LIST} -r ${_UNIFIED_DEPENDS:Q}
@@ -4255,12 +4255,12 @@ PACKAGE-DEPENDS-LIST?= \
 		/*) ;; \
 		*) dir=${PORTSDIR}/$$dir ;; \
 		esac ; \
-		dir=$`${REALPATH} $$dir`; \
+		dir=$$(${REALPATH} $$dir); \
 		if [ -d $$dir ]; then \
 			case $$checked in	\
 			$$dir|$$dir\ *|*\ $$dir|*\ $$dir\ *) continue;;	\
 			esac;	\
-			childout=$`cd $$dir; ${SETENV} FLAVOR=$${flavor} ${MAKE} CHILD_DEPENDS=yes PARENT_CHECKED="$$checked" package-depends-list`; \
+			childout=$$(cd $$dir; ${SETENV} FLAVOR=$${flavor} ${MAKE} CHILD_DEPENDS=yes PARENT_CHECKED="$$checked" package-depends-list); \
 			set -- $$childout; \
 			childdir=""; \
 			while [ $$\# != 0 ]; do \
@@ -4421,21 +4421,21 @@ readme:
 
 ${.CURDIR}/README.html:
 	@${ECHO_MSG} "===>   Creating README.html for ${PKGNAME}"
-	@${SED} -e 's|%%PORT%%|'$`${ECHO_CMD} ${.CURDIR} | \
-							  ${SED} -e 's|.*/\([^/]*/[^/]*\)$$|\1|'`'|g' \
+	@${SED} -e 's|%%PORT%%|'$$(${ECHO_CMD} ${.CURDIR} | \
+							  ${SED} -e 's|.*/\([^/]*/[^/]*\)$$|\1|')'|g' \
 			-e 's|%%PKG%%|${PKGNAME}|g' \
-			-e 's|%%COMMENT%%|'"$`${ECHO_CMD} ${COMMENT:Q}`"'|' \
+			-e 's|%%COMMENT%%|'"$$(${ECHO_CMD} ${COMMENT:Q})"'|' \
 			-e '/%%COMMENT%%/d' \
-			-e 's|%%DESCR%%|'"$`${ECHO_CMD} ${DESCR} | \
-								 ${SED} -e 's|${.CURDIR}/||'`"'|' \
-			-e 's|%%EMAIL%%|'"$`${ECHO_CMD} "${MAINTAINER}" | \
-								 ${SED} -e 's/([^)]*)//;s/.*<//;s/>.*//'`"'|g' \
+			-e 's|%%DESCR%%|'"$$(${ECHO_CMD} ${DESCR} | \
+								 ${SED} -e 's|${.CURDIR}/||')"'|' \
+			-e 's|%%EMAIL%%|'"$$(${ECHO_CMD} "${MAINTAINER}" | \
+								 ${SED} -e 's/([^)]*)//;s/.*<//;s/>.*//')"'|g' \
 			-e 's|%%MAINTAINER%%|${MAINTAINER}|g' \
-			-e 's|%%WEBSITE%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-www-site`"'|' \
-			-e 's|%%BUILD_DEPENDS%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-build-depends-list`"'|' \
-			-e 's|%%RUN_DEPENDS%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-run-depends-list`"'|' \
-			-e 's|%%TOP%%|'"$`${ECHO_CMD} ${CATEGORIES} | \
-							   ${SED} -e 's| .*||' -e 's|[^/]*|..|g'`"'/..|' \
+			-e 's|%%WEBSITE%%|'"$$(cd ${.CURDIR} && eval ${MAKE} pretty-print-www-site)"'|' \
+			-e 's|%%BUILD_DEPENDS%%|'"$$(cd ${.CURDIR} && eval ${MAKE} pretty-print-build-depends-list)"'|' \
+			-e 's|%%RUN_DEPENDS%%|'"$$(cd ${.CURDIR} && eval ${MAKE} pretty-print-run-depends-list)"'|' \
+			-e 's|%%TOP%%|'"$$(${ECHO_CMD} ${CATEGORIES} | \
+							   ${SED} -e 's| .*||' -e 's|[^/]*|..|g')"'/..|' \
 		${TEMPLATES}/README.port >> ${.TARGET}
 
 # The following two targets require an up-to-date INDEX in ${PORTSDIR}

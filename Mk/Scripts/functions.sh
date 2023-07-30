@@ -9,6 +9,8 @@ _strip_perms() {
 	    -e 's/^(@[[:alpha:]]+)\([^)]*\)[[:space:]]+/\1 /'
 }
 
+_OS_PORTMK="irix.port.mk"
+
 # Expand TMPPLIST to absolute paths, splitting files and dirs into separate
 # descriptors.
 # Input:
@@ -186,7 +188,7 @@ export_ports_env() {
 
 	make_cmd="${make_env}"
 
-	export_vars="$(${MAKE} -f ${PORTSDIR}/Mk/bsd.port.mk \
+	export_vars="$(${MAKE} -f ${PORTSDIR}/Mk/${_OS_PORTMK} \
 	    -V PORTS_ENV_VARS ${make_env} USES="${uses}")"
 
 	for var in ${export_vars}; do
