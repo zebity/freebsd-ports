@@ -3180,8 +3180,6 @@ fetch-url-list: fetch-url-list-int
 clean-wrkdir:
 	@${RM} -r ${WRKDIR}
 
-#	for file in ${EXTRACT_ONLY}; do 
-#		echo "DBG>> do-extract: '${file}' '${EXTRAC_WKDIR}' '${EXTRACT_CMD}' '${EXTRA_BEFORE_ARGS}' '${_DISTDIR}' '${EXTRACT_AFTER_ARGS}'.";
 
 # SAVE
 # do-extract: ${EXTRACT_WRKDIR}

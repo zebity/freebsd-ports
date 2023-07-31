@@ -31,6 +31,16 @@ To Bootstrap bmake:
     irix.port.mk (not "bsd.port.mk") and run "bmake <target> prefix=/target
 5 - Be prepared to debug the IRIX Port tools .... ;-)
 
+Other Bootstrapping bits (dialog4ports. openssl)
+
+1 - To bulid dialog4ports you need to turn off CHECKSUM & use "z" flag (gzip) to tar
+2 - cd /usr/ports/ports-mgmt/dialog4ports
+3 - bmake -d l extract NO_CHECKSUM=yes EXTRACT_BEFORE_ARGS=-xzf prefix=/usr/local2
+.... next step
+4 - bmake -d l build NO_CHECKSUM=yes EXTRACT_BEFORE_ARGS=-xzf CC=cd99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" prefix=/usr/local2
+
+
+
 OTHER:
 
 All feedback via the github repo.
