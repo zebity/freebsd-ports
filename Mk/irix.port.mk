@@ -3180,10 +3180,25 @@ fetch-url-list: fetch-url-list-int
 clean-wrkdir:
 	@${RM} -r ${WRKDIR}
 
+#	for file in ${EXTRACT_ONLY}; do 
+#		echo "DBG>> do-extract: '${file}' '${EXTRAC_WKDIR}' '${EXTRACT_CMD}' '${EXTRA_BEFORE_ARGS}' '${_DISTDIR}' '${EXTRACT_AFTER_ARGS}'.";
+
+# SAVE
+# do-extract: ${EXTRACT_WRKDIR}
+#	for file in ${EXTRACT_ONLY}; do \
+#		if ! ( cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS} );\
+#		then \
+#			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
+#			exit 1; \
+#		fi; \
+#	done
+
+
 .    if !target(do-extract)
+
 do-extract: ${EXTRACT_WRKDIR}
-	@for file in ${EXTRACT_ONLY}; do \
-		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS});\
+	for file in ${EXTRACT_ONLY}; do \
+		if ! ( cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS} ); \
 		then \
 			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
 			exit 1; \
@@ -4357,6 +4372,7 @@ missing-packages:
 # Install missing dependencies from package
 install-missing-packages:
 	@_dirs=$`${MISSING-DEPENDS-LIST}`; \
+	echo "DBG>> _dirs: '${_dirs}'."
 	${ECHO_CMD} "$${_dirs}" | ${SED} "s%${PORTSDIR}/%%g" | \
 		${SU_CMD} "${XARGS} -o ${PKG_BIN} install -A"
 
@@ -4421,7 +4437,8 @@ readme:
 
 ${.CURDIR}/README.html:
 	@${ECHO_MSG} "===>   Creating README.html for ${PKGNAME}"
-	@${SED} -e 's|%%PORT%%|'$`${ECHO_CMD} ${.CURDIR} | \
+#	@${SED} -e 's|%%PORT%%|'$`${ECHO_CMD} ${.CURDIR} | \
+	${SED} -e 's|%%PORT%%|'$`${ECHO_CMD} ${.CURDIR} | \
 							  ${SED} -e 's|.*/\([^/]*/[^/]*\)$$|\1|'`'|g' \
 			-e 's|%%PKG%%|${PKGNAME}|g' \
 			-e 's|%%COMMENT%%|'"$`${ECHO_CMD} ${COMMENT:Q}`"'|' \
@@ -4498,6 +4515,7 @@ generate-plist: ${WRKDIR}
 	@for file in ${PLIST_FILES}; do \
 		${ECHO_CMD} $${file} | ${SED} ${PLIST_SUB_SANITIZED:S/$/!g/:S/^/ -e s!%%/:S/=/%%!/} >> ${TMPPLIST}; \
 	done
+	echo "DBG file: '${file}'."
 .      if !empty(PLIST)
 .        for f in ${PLIST}
 	@if [ -f "${f}" ]; then \
@@ -5228,7 +5246,8 @@ show-dev-errors:
 .    endif #DEVELOPER
 
 ${_PORTS_DIRECTORIES}:
-	@${MKDIR} ${.TARGET}
+	${MKDIR} ${.TARGET}
+#	@${MKDIR} ${.TARGET}
 
 # Please note that the order of the following targets is important, and
 # should not be modified.
