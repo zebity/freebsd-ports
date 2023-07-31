@@ -3198,6 +3198,7 @@ clean-wrkdir:
 
 do-extract: ${EXTRACT_WRKDIR}
 	for file in ${EXTRACT_ONLY}; do \
+		echo "DBG>> do-extract: file='${file}' dollarsfile='$$file' workdir='${EXTRACT_WRKDIR}' cmd='${EXTRACT_CMD}' before='${EXTRACT_BEFORE_ARGS}' distfile='${_DISTDIR}/$$file' after='${EXTRACT_AFTER_ARGS}'."; \
 		if ! ( cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS} ); \
 		then \
 			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
