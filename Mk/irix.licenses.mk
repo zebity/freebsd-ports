@@ -732,7 +732,11 @@ ${_LICENSE_COOKIE}:
 
 # Create report and catalog
 .    if !defined(NO_LICENSES_INSTALL)
-	@${RM} ${_LICENSE_CATALOG_TMP} ${_LICENSE_REPORT_TMP}
+	if [ ${RM} ${_LICENSE_CATALOG_TMP} ${_LICENSE_REPORT_TMP} ]; then \
+		true; \
+	else \
+		echo "DBG>> license removal catalog='{${LICENSE_CATALOG_TMP}' report='${_LICENSE_REPORT_TMP}' failed continuing ..." ; \
+	fi
 .      if ${_LICENSE_COMB} == "single"
 # Catalog
 .        for var in _LICENSE _LICENSE_NAME _LICENSE_PERMS _LICENSE_GROUPS _LICENSE_DISTFILES

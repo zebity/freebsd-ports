@@ -2115,7 +2115,7 @@ TOUCH?=			/usr/bin/touch
 TOUCH_FLAGS?=	-f
 
 DISTORIG?=	.bak.orig
-PATCH?=			/usr/bin/patch
+PATCH?=			/usr/sbin/patch
 PATCH_STRIP?=	-p0
 PATCH_DIST_STRIP?=	-p0
 .    if defined(PATCH_DEBUG)
@@ -3240,7 +3240,7 @@ do-patch:
 			dp_SCRIPTSDIR="${SCRIPTSDIR}" \
 			dp_UNZIP_NATIVE_CMD="${UNZIP_NATIVE_CMD}" \
 			dp_XZCAT="${XZCAT}" \
-			${SH} ${SCRIPTSDIR}/do-patch.sh
+			${SH} ${SCRIPTSDIR}/irix.do-patch.sh
 .    endif
 
 .    if !target(run-autotools-fixup)
