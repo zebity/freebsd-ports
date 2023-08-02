@@ -2062,7 +2062,7 @@ MAKE_JOBS_NUMBER=	1
 _MAKE_JOBS_NUMBER:=	${MAKE_JOBS_NUMBER}
 .      else
 .        if !defined(_SMP_CPUS)
-_HINV_PROCS!= ${HINV} -c processor | ${GREP} -c CPU}
+_HINV_PROCS!= ${HINV} -c processor | ${GREP} -c CPU
 
 .    	    if ${_HINV_PROCS} > 1
 _SMP_CPUS=${_HINV_PROCS}
