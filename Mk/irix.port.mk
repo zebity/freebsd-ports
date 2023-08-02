@@ -2245,7 +2245,7 @@ INSTALL_TARGET+=	${LATE_INSTALL_ARGS}
 
 # Integrate with the license auditing framework
 .    if !defined (DISABLE_LICENSES)
-.include "${PORTSDIR}/Mk/bsd.licenses.mk"
+.include "${PORTSDIR}/Mk/irix.licenses.mk"
 .    endif
 
 # Popular master sites
@@ -3178,7 +3178,11 @@ fetch-url-list: fetch-url-list-int
 # Extract
 
 clean-wrkdir:
-	@${RM} -r ${WRKDIR}
+	if [ -e "${WRKDIR}" ]; then \
+		@${RM} -r ${WRKDIR} ; \
+	else \
+		echo "DBG>> clear-workdir - workdir='${WRKDIR}' not found, continuing..." ; \
+	fi
 
 
 # SAVE
@@ -4079,7 +4083,8 @@ _FLAVOR_RECURSIVE_SH= \
 		/*) ;; \
 		*) dir=${PORTSDIR}/$$dir ;; \
 		esac; \
-		(cd $$dir; ${SETENV} $${flavor:+FLAVOR=$${flavor}} ${MAKE} $${recursive_cmd}); \
+		echo "DBG>> _FLAVOR_RECURSIVE_SH: dir='${dir}' dddir='$$dir' ddbdir='$${dir}' ddbr_dir='$${recursive_dirs}' flavor='$$flavor' recursive_cmd='$${recursive_cmd}'." ; \
+		 (cd $$dir; ${SETENV} $${flavor:+FLAVOR=$${flavor}} ${MAKE} $${recursive_cmd}); \
 	done
 
 # This script is shared among several dependency list variables.  See file for
@@ -4131,6 +4136,7 @@ fetch-specials:
 	@${ECHO_MSG} "===> Fetching all distfiles required by ${PKGNAME} for building"
 	@recursive_cmd="fetch"; \
 	    recursive_dirs="${_DEPEND_SPECIALS}"; \
+		echo "DBG>> fetch-specials - '${_DEPEND_SPECIALS}'" ; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
@@ -4371,7 +4377,7 @@ missing-packages:
 # Install missing dependencies from package
 install-missing-packages:
 	@_dirs=$`${MISSING-DEPENDS-LIST}`; \
-	echo "DBG>> _dirs: '${_dirs}'."
+	echo "DBG>> _dirs: '${_dirs}'." ; \
 	${ECHO_CMD} "$${_dirs}" | ${SED} "s%${PORTSDIR}/%%g" | \
 		${SU_CMD} "${XARGS} -o ${PKG_BIN} install -A"
 
@@ -4445,7 +4451,7 @@ ${.CURDIR}/README.html:
 			-e 's|%%DESCR%%|'"$`${ECHO_CMD} ${DESCR} | \
 								 ${SED} -e 's|${.CURDIR}/||'`"'|' \
 			-e 's|%%EMAIL%%|'"$`${ECHO_CMD} "${MAINTAINER}" | \
-								 ${SED} -e 's/([^)]*)//;s/.*<//;s/>.*//')"'|g' \
+								 ${SED} -e 's/([^)]*`//;s/.*<//;s/>.*//')"'|g' \
 			-e 's|%%MAINTAINER%%|${MAINTAINER}|g' \
 			-e 's|%%WEBSITE%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-www-site`"'|' \
 			-e 's|%%BUILD_DEPENDS%%|'"$`cd ${.CURDIR} && eval ${MAKE} pretty-print-build-depends-list`"'|' \
@@ -4514,7 +4520,7 @@ generate-plist: ${WRKDIR}
 	@for file in ${PLIST_FILES}; do \
 		${ECHO_CMD} $${file} | ${SED} ${PLIST_SUB_SANITIZED:S/$/!g/:S/^/ -e s!%%/:S/=/%%!/} >> ${TMPPLIST}; \
 	done
-	echo "DBG file: '${file}'."
+	echo "DBG>> file: '${file}'."
 .      if !empty(PLIST)
 .        for f in ${PLIST}
 	@if [ -f "${f}" ]; then \
@@ -5435,10 +5441,12 @@ ${${target:tu}_COOKIE}::
 
 .    if !target(check-sanity)
 check-sanity: ${_SANITY_REAL_SEQ}
+	echo "DBG>> setting 'check-sanity:': .TARGET='${.TARGET}' TARGET='${TARGET}' real-seq='${_SANITY_REAL_SEQ}'."
 .    endif
 
 .    if !target(fetch)
 fetch: ${_FETCH_DEP} ${_FETCH_REAL_SEQ}
+	echo "DBG>> setting 'fetch:': dep='${_FETCH_DEP}' real-seq='${_FETCH_REL_SEQ}'."
 .    endif
 
 .    if !target(pkg)
