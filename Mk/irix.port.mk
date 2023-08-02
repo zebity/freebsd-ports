@@ -4112,14 +4112,14 @@ CLEAN-DEPENDS-LIMITED-LIST=	${DEPENDS-LIST} -w ${_UNIFIED_DEPENDS:Q}
 
 .    if !target(clean-depends)
 clean-depends:
-	@for dir in $`${CLEAN-DEPENDS-LIST}`; do \
+	@for dir in $\`${CLEAN-DEPENDS-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
 .    endif
 
 .    if !target(limited-clean-depends)
 limited-clean-depends:
-	@for dir in $`${CLEAN-DEPENDS-LIMITED-LIST}`; do \
+	@for dir in $\`${CLEAN-DEPENDS-LIMITED-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
 .    endif
@@ -4143,15 +4143,17 @@ fetch-specials:
 .    if !target(fetch-recursive)
 fetch-recursive:
 	@${ECHO_MSG} "===> Fetching all distfiles for ${PKGNAME} and dependencies"
+	zz=`${ALL-DEPENDS-FLAVORS-LIST}`
+	echo "DBG>> fetch-recursive - all-depends-flavours='@{ALL-DEPENDS-FLAVORS-LIST}' >> '@{zz}'." 
 	@recursive_cmd="fetch"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $\`${ALL-DEPENDS-FLAVORS-LIST}`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
 .    if !target(fetch-recursive-list)
 fetch-recursive-list:
 	@recursive_cmd="fetch-list"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $`${ALL-DEPENDS-FLAVORS-LIST}`"; \
+	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} $\`${ALL-DEPENDS-FLAVORS-LIST}\`"; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 

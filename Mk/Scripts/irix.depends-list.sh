@@ -37,8 +37,8 @@ while getopts "fmrw" FLAG; do
 done
 
 # shift $((OPTIND-1))
-let "_optind-minus=OPTIND - 1"
-shift ${_optind-minus}
+let "_optind_minus=OPTIND - 1"
+shift ${_optind_minus}
 
 validate_env PORTSDIR dp_OVERLAYS dp_PKGNAME
 if [ ${recursive} -eq 1 -o ${requires_wrkdir} -eq 1 ]; then
@@ -59,7 +59,10 @@ fi
 check_dep() {
 	local _dep wrkdir show_dep
 
+	echo "DBG>> check_dep - _dep='${_dep}'".
+
 	for _dep ; do
+		echo "DBG>> for check_dep - _dep='${_dep}'".
 		unset FLAVOR
 		myifs=${IFS}
 		IFS=:
