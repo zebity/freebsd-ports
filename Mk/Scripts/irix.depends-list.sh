@@ -59,10 +59,10 @@ fi
 check_dep() {
 	local _dep wrkdir show_dep
 
-	echo "DBG>> check_dep - _dep='${_dep}'".
+	echo "DBG>> check_dep - _dep='${_dep}'."
 
 	for _dep ; do
-		echo "DBG>> for check_dep - _dep='${_dep}'".
+		echo "DBG>> for check_dep - _dep='${_dep}'."
 		unset FLAVOR
 		myifs=${IFS}
 		IFS=:
@@ -144,4 +144,5 @@ check_dep() {
 checked=
 # shellcheck disable=SC2068
 # Do not add quotes, we want to split the string here.
+echo "DBG>> irix.depends-list.sh - checking args='${@}'."
 check_dep $@
