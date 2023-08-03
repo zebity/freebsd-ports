@@ -18,14 +18,18 @@ IRIX wrapper scripts into bmake macro and the target bin directory
 To Bootstrap bmake:
 
 1 - cd /usr/ports/IRIX/bootstrap
-2 - ./irix-ports-bootstrap.sh [-d] -b /build/dir prefix=/install/dir
+2 - ./irix-ports-bootstrap.sh [-c] [-m] [-d] [-a /local/archive] -b /build/dir prefix=/install/dir
     where:
-    -d == delete the bmake download and working directory once done
+    -c == cleanup / delete the bmake/dialog download and working directory once done
+    -m == bootstrap bmake
+    -d == bootstrap dialog
+    -a == optional archive location to find bmake / dialog archives if not able to download
     -b == download and build bmake in the /build/directory
     prefix == the directory where you want bmake/scripts to be
               installed in. This is likely to be the same
               directory where the ports will install too
               For now this defaults to: /usr/local2 
+     NOTE; dialog auto build fails but hand made build succeeds .... ???
 3 - Ensure your PATH includes the target bin directory [/usr/local2/bin]
 4 - To try to build a port, ensure that the Makefile is including
     irix.port.mk (not "bsd.port.mk") and run "bmake <target> prefix=/target

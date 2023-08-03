@@ -7,9 +7,16 @@ build_in="/tmp/ports"
 cur_dir=`pwd`
 
 delete=no
+loc_archive=
+boot_bmake=no
+boot_dialog=no
 
 bmake_archive="http://www.crufty.net/ftp/pub/sjg/bmake.tar.gz"
-bmake_tar=`basename ${bmake_archive}`
+bmake_taz=`basename ${bmake_archive}`
+
+dialog_archive=https://invisible-island.net/archives/dialog/dialog.tar.gz
+dialog_taz=`basename ${dialog_archive}`
+
 irix_port_mks="irix.port.mk irix.port.post.mk irix.port.pre.mk"
 irix_wrappers_sh="irix.env.sh irix.fetch.sh irix.pkg.sh"
 
@@ -21,7 +28,7 @@ TAR=/usr/freeware/bin/tar
 # echo "args: $*"
 
 if [ $# -eq 0 ]; then
-	echo "Usage: '${0} -d -b /build/dir prefix=/install/dir'."
+	echo "Usage: '${0} [-c] [-m] [-d] -b /build/dir [-a /archive/local] prefix=/install/dir'."
 else
 
 	if [ ! -d "${SGI_FREEWARE}" ] || [ ! -f `which ${GZCAT}` ]; then
@@ -33,8 +40,11 @@ else
 	do
 #		echo "arg: '${1}'."
 		case "$1" in
-			-d) delete=yes ;;
+			-c) delete=yes ;;
+			-m) boot_bmake=yes ;;
+			-d) boot_dialog=yes ;;
 			-b) build_in=$2 ; shift ;;
+			-a) loc_archive=$2 ; shift ;;
 			--) shift; break;;
 			*) break;;
 		esac
@@ -44,51 +54,100 @@ else
 	if [[ $# = 1 ]] && [[ "$1" = prefix=/* ]]; then
 
 		prefix_dir=${1#prefix=}
-
 		mkdir -p ${build_in}
-		cd ${build_in}
-		if [ -f ${bmake_tar} ]; then
-			rm ${bmake_tar}
+
+		#
+		# get & build bmake
+		#
+		if [ ${boot_bmake} = "yes" ]; then
+			( cd ${build_in}
+				if [ -f ${bmake_taz} ]; then
+					rm ${bmake_taz}
+				fi
+				${WGET} ${bmake_archive}
+				if [ ! -e ${bmake_taz} ]; then
+					cp ${loc_archive}/${bmake_taz} .
+					if [  $? = 0 ]; then
+						echo "Info: found '${bmake_taz}' in local archive." 
+					else
+						echo "Error: Unable to find or get '${bmake_taz}'."
+						exit 1 
+					fi
+				fi 
+				${GZCAT} ${bmake_taz} | ${TAR} -xvf -
+				( cd bmake
+					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" ${prefix_dir} 
+					sh ./make-bootstrap.sh
+					make install
+				)
+				if [ $? != 0 ]; then
+					echo "Error: bmake build returned failure code, aborting."
+					exit 1
+				fi
+			)
+			if [ -d ${prefix_dir} ]; then
+
+				mkdir -p ${prefix_dir}/share/ports/mk
+				cp ..${irix_mks}/*.mk ${prefix_dir}${irix_mks}
+				( cd ${prefix_dir}/share/mk
+					for f in ${irix_port_mks}
+					do
+						ln -s ../ports/mk/${f} ${f}
+					done
+				)
+
+				cp ..${irix_wrappers}/*.sh ${prefix_dir}/bin
+				( cd ${prefix_dir}/bin
+					for f in ${irix_wrappers_sh}
+					do
+						x=${f#irix.}
+						x=${x%.sh}
+						ln -s ${f} ${x} 
+					done
+				)
+			else
+				echo "Error: failed to create directory - '${prefix_dir}'."
+			fi
 		fi
-		${WGET} ${bmake_archive}
-		${GZCAT} ${bmake_tar} | ${TAR} -xvf -
-		cd bmake
-		./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" ${1}
-		sh ./make-bootstrap.sh
-		make install
 
-		if [ "${delete}" = "yes" ]; then
-			cd ..
-			rm ${bmake_tar}
-			rm -rf bmake
+		#
+		# get & build dialog
+		#
+		if [ ${boot_dialog} = "yes" ]; then
+
+			( cd ${build_in}
+				if [ -f ${dialog_taz} ]; then
+					rm ${dialog_taz}
+				fi
+				${WGET} ${dialog_archive}
+				if [ ! -e ${dialog_taz} ]; then
+					cp ${loc_archive}/${dialog_taz} .
+					if [ $? = 0 ]; then
+						echo "Info: found '${dialog_taz}' in local archive." 
+					else
+						echo "Error: Unable to find or get '${dialog_taz}'."
+						exit 1 
+					fi
+				fi 
+				${GZCAT} ${dialog_taz} | ${TAR} -xvf -
+				dialog_dir=`ls | grep dialog- | cut -f1 -d" "`
+				( cd ${dialog_dir}
+					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" ${prefix_dir} 
+					${prefix_dir}/bin/bmake -f makefile 
+					${prefix_dir}/bin/bmake -f makefile install-full
+				)
+#i				if [ $? != 0 ]; then
+#					echo "Error: dialog build returned failure code, aborting."
+#					exit 1
+#				fi
+
+			)
 		fi
 
-		cd ${cur_dir}
-
-		if [ -d ${prefix_dir} ]; then
-
-			mkdir -p ${prefix_dir}/share/ports/mk
-			cp ..${irix_mks}/*.mk ${prefix_dir}${irix_mks}
-			cd ${prefix_dir}/share/mk
-			for f in ${irix_port_mks}
-			do
-				ln -s ../ports/mk/${f} ${f}
-			done
-
-			cd ${cur_dir}
-			cp ..${irix_wrappers}/*.sh ${prefix_dir}/bin
-			cd ${prefix_dir}/bin
-			for f in ${irix_wrappers_sh}
-			do
-				x=${f#irix.}
-				x=${x%.sh}
-				ln -s ${f} ${x} 
-			done
-			cd ${cur_dir}
-		else
-			echo "Error: failed to create directory - '${prefix_dir}'."
+		if [ ${delete} = "yes" ]; then
+			rm -rf ${build_in}
 		fi
 	else
-		echo "Usage: '${0} -b /build/dir prefix=/install/dir'."
+		echo "Usage: '${0} [-c] [-m] [-d] -b /build/dir prefix=/install/dir'."
 	fi
 fi
