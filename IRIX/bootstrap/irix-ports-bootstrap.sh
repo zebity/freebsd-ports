@@ -76,7 +76,7 @@ else
 				fi 
 				${GZCAT} ${bmake_taz} | ${TAR} -xvf -
 				( cd bmake
-					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" ${prefix_dir} 
+					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" prefix=${prefix_dir} 
 					sh ./make-bootstrap.sh
 					make install
 				)
@@ -132,7 +132,7 @@ else
 				${GZCAT} ${dialog_taz} | ${TAR} -xvf -
 				dialog_dir=`ls | grep dialog- | cut -f1 -d" "`
 				( cd ${dialog_dir}
-					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" ${prefix_dir} 
+					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" prefix=${prefix_dir} 
 					${prefix_dir}/bin/bmake -f makefile 
 					${prefix_dir}/bin/bmake -f makefile install-full
 				)

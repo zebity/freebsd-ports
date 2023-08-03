@@ -29,7 +29,6 @@ To Bootstrap bmake:
               installed in. This is likely to be the same
               directory where the ports will install too
               For now this defaults to: /usr/local2 
-     NOTE; dialog auto build fails but hand made build succeeds .... ???
 3 - Ensure your PATH includes the target bin directory [/usr/local2/bin]
 4 - To try to build a port, ensure that the Makefile is including
     irix.port.mk (not "bsd.port.mk") and run "bmake <target> prefix=/target
