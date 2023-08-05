@@ -3179,7 +3179,7 @@ fetch-url-list: fetch-url-list-int
 
 clean-wrkdir:
 	if [ -e "${WRKDIR}" ]; then \
-		@${RM} -r ${WRKDIR} ; \
+		${RM} -r ${WRKDIR} ; \
 	else \
 		echo "DBG>> clear-workdir - workdir='${WRKDIR}' not found, continuing..." ; \
 	fi
@@ -4112,17 +4112,20 @@ CLEAN-DEPENDS-LIMITED-LIST=	${DEPENDS-LIST} -w ${_UNIFIED_DEPENDS:Q}
 
 .    if !target(clean-depends)
 clean-depends:
-	@for dir in $\`${CLEAN-DEPENDS-LIST}`; do \
+	@for dir in `$${CLEAN-DEPENDS-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
 .    endif
 
 .    if !target(limited-clean-depends)
+BACKQ="`"
 limited-clean-depends:
-	@for dir in $\`${CLEAN-DEPENDS-LIMITED-LIST}`; do \
-		echo "DBG>> limited-clean - dir='${dir}' dddir='$$dir'." ; \
+	echo "DBG>> limited-clean-depends - depends-list='`${CLEAN-DEPENDS-LIMITED-LIST}`."
+	@for dir in `${CLEAN-DEPENDS-LIMITED-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
+
+#		echo "DBG>> limited-clean - dir='${dir}' dddir='$$dir'." ; 
 .    endif
 
 .    if !target(deinstall-depends)
@@ -4281,7 +4284,7 @@ PACKAGE-DEPENDS-LIST?= \
 			case $$checked in	\
 			$$dir|$$dir\ *|*\ $$dir|*\ $$dir\ *) continue;;	\
 			esac;	\
-			childout=$`cd $$dir; ${SETENV} FLAVOR=$${flavor} ${MAKE} CHILD_DEPENDS=yes PARENT_CHECKED="$$checked" package-depends-list'; \
+			childout=$\`cd $$dir; ${SETENV} FLAVOR=$${flavor} ${MAKE} CHILD_DEPENDS=yes PARENT_CHECKED="$$checked" package-depends-list`; \
 			set -- $$childout; \
 			childdir=""; \
 			while [ $$\# != 0 ]; do \

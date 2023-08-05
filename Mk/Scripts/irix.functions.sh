@@ -9,6 +9,8 @@ _strip_perms() {
 	    -e 's/^(@[[:alpha:]]+)\([^)]*\)[[:space:]]+/\1 /'
 }
 
+_OS_PORTMK="irix.port.mk"
+
 # Expand TMPPLIST to absolute paths, splitting files and dirs into separate
 # descriptors.
 # Input:
@@ -39,7 +41,7 @@ parse_plist() {
 			line="${line##*@comment }"
 			# Strip (owner,group,perm) from keywords
 			# Need to do this again after stripping away @comment.
-			line="$(printf %s "$line" | _strip_perms)"
+			line="`printf %s "$line" | _strip_perms`"
 			# Remove @comment so it can be parsed as a file,
 			# but later prepend it again to create a list of
 			# all files commented and uncommented.
@@ -62,13 +64,13 @@ parse_plist() {
 
 		case $line in
 		@dir*|'@unexec rmdir'*|'@unexec /bin/rmdir'*)
-			line="$(printf %s "$line" \
+			line="`printf %s "$line" \
 			    | sed -Ee 's/\|\|.*//;s|[[:space:]]+[0-9]*[[:space:]]*>[&]?[[:space:]]*[^[:space:]]+||g' \
 			        -e "/^@unexec[[:space:]]+(\/bin\/)?rmdir( -p)?/s|([^%])%D([^%])|\1${cwd}\2|g" \
 			        -e '/^@unexec[[:space:]]+(\/bin\/)?rmdir( -p)?/s|"(.*)"[[:space:]]*|\1|g' \
 			        -e 's/@unexec[[:space:]]+(\/bin\/)?rmdir( -p)?[[:space:]]+//' \
 				-e 's/@dir(rm|rmtry)?[[:space:]]+//' \
-				-e 's/[[:space:]]+$//')"
+				-e 's/[[:space:]]+$//'`"
 			case "$line" in
 			/*) echo >&3 "${comment}${line%/}" ;;
 			*)  echo >&3 "${comment}${cwd}/${line%/}" ;;
@@ -186,21 +188,21 @@ export_ports_env() {
 
 	make_cmd="${make_env}"
 
-	export_vars="$(${MAKE} -f ${PORTSDIR}/Mk/bsd.port.mk \
-	    -V PORTS_ENV_VARS ${make_env} USES="${uses}")"
+	export_vars="`${MAKE} -f ${PORTSDIR}/Mk/${_OS_PORTMK} \
+	    -V PORTS_ENV_VARS ${make_env} USES="${uses}"`"
 
 	for var in ${export_vars}; do
 		make_cmd="${make_cmd}${make_cmd:+ }-V ${var}=\${${var}:Q}"
 	done
 
 	# Bring in all the vars, but not empty ones.
-	eval "$(${MAKE} -f ${PORTSDIR}/Mk/bsd.port.mk ${make_cmd} \
-		USES="${uses}" | grep -v '=$' | sed -e 's,\\ $,,')"
+	eval "`${MAKE} -f ${PORTSDIR}/Mk/bsd.port.mk ${make_cmd} \
+		USES="${uses}" | grep -v '=$' | sed -e 's,\\ $,,'`"
 	for var in ${export_vars}; do
 		# Export and display non-empty ones.  This is not redundant
 		# with above since we're looping on all vars here; do not
 		# export a var we didn't eval in.
-		value="$(eval echo \$${var})"
+		value="`eval echo \$${var}`"
 
 		if [ -n "${value}" ]; then
 			# shellcheck disable=SC2163
@@ -272,6 +274,6 @@ port_var_fetch() {
 		setvar "$1" "${_line}"
 		shift
 	done <<-EOF
-	$(${dp_MAKE} -C "${origin}" ${make_args} ${_makeflags} || echo)
+	`${dp_MAKE} -C "${origin}" ${make_args} ${_makeflags} || echo`
 	EOF
 }

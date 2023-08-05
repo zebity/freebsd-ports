@@ -1,16 +1,24 @@
-#!/bin/sh
+#!/bin/sh -x
 # MAINTAINER: portmgr@FreeBSD.org
 
 set -e
 # set -o pipefail
 
-. ${dp_SCRIPTSDIR}/functions.sh
+echo "DBG>> irix.depends.list - sourcing functions..."
+
+. ${dp_SCRIPTSDIR}/irix.functions.sh
+
+echo "DBG>> irix.depends.list -sauced."
 
 flavors=0
 recursive=0
 missing=0
 requires_wrkdir=0
+
 while getopts "fmrw" FLAG; do
+
+	echo "DBG>> irix.depends-list - flag='${FLAG}'."
+
 	case "${FLAG}" in
 		f)
 			flavors=1
@@ -53,7 +61,7 @@ fi
 set -u
 
 if [ ${missing} -eq 1 ]; then
-	existing=$(${dp_PKG_INFO} -aoq|paste -d ' ' -s -)
+	existing=`${dp_PKG_INFO} -aoq|paste -d ' ' -s -`
 fi
 
 check_dep() {
@@ -118,13 +126,13 @@ check_dep() {
 		if [ ${requires_wrkdir} -eq 1 ]; then
 			# shellcheck disable=SC2046
 			# We want word splitting here.
-			set -- $(${dp_MAKE} -C ${d} -VWRKDIR -V_UNIFIED_DEPENDS)
+			set -- `${dp_MAKE} -C ${d} -VWRKDIR -V_UNIFIED_DEPENDS`
 			wrkdir="$1"
 			shift
 		elif [ ${recursive} -eq 1 ]; then
 			# shellcheck disable=SC2046
 			# We want word splitting here.
-			set -- $(${dp_MAKE} -C ${d} -V_UNIFIED_DEPENDS)
+			set -- `${dp_MAKE} -C ${d} -V_UNIFIED_DEPENDS`
 		fi
 
 		# If a WRKDIR is required to show the dependency, check for it.
