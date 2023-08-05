@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # NAME:
 #	irix.env.sh - wrapper for FreeBSD env command
@@ -106,7 +106,7 @@ else
 	for a in "${@}"
 	do
 		savargs[${i}]="${a}"
-		echo "DBG>> $0 - arg[${i}]: '${a}'."
+#		echo "DBG>> $0 - arg[${i}]: '${a}'."
 		let "i=i + 1"
 	done
 
@@ -197,12 +197,12 @@ else
 	else
 
 # DEBUG
-		i=0
-		for a in "${keepargs[@]}"
-		do
-			echo "$0 - arg[${i}]: '${a}'."
-			let "i=i + 1"
-		done
+#		i=0
+#		for a in "${keepargs[@]}"
+#		do
+#			echo "DBG>> $0 - arg[${i}]: '${a}'."
+#			let "i=i + 1"
+#		done
 #
 		echo "DBG>> '""${IRIX_ENV}" "${inherit}" "${keepargs[@]}" "'."
 
