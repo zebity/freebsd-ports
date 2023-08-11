@@ -3181,7 +3181,7 @@ clean-wrkdir:
 	if [ -e "${WRKDIR}" ]; then \
 		${RM} -r ${WRKDIR} ; \
 	else \
-		echo "DBG>> clear-workdir - workdir='${WRKDIR}' not found, continuing..." ; \
+		echo "DBG>> clear-workdir: - workdir='${WRKDIR}' not found, continuing..." ; \
 	fi
 
 
@@ -3200,7 +3200,6 @@ clean-wrkdir:
 
 do-extract: ${EXTRACT_WRKDIR}
 	for file in ${EXTRACT_ONLY}; do \
-		echo "DBG>> do-extract: file='${file}' dollarsfile='$$file' workdir='${EXTRACT_WRKDIR}' cmd='${EXTRACT_CMD}' before='${EXTRACT_BEFORE_ARGS}' distfile='${_DISTDIR}/$$file' after='${EXTRACT_AFTER_ARGS}'."; \
 		if ! ( cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS} ); \
 		then \
 			${ECHO_MSG} "===>  Failed to extract \"${_DISTDIR}/$$file\"."; \
@@ -3211,6 +3210,9 @@ do-extract: ${EXTRACT_WRKDIR}
 		${CHMOD} -R ug-s ${WRKDIR}; \
 		${CHOWN} -R 0:0 ${WRKDIR}; \
 	fi
+
+#	echo "DBG>> do-extract: file='${file}' dollarsfile='$$file' workdir='${EXTRACT_WRKDIR}' cmd='${EXTRACT_CMD}' before='${EXTRACT_BEFORE_ARGS}' distfile='${_DISTDIR}/$$file' after='${EXTRACT_AFTER_ARGS}'.";
+
 .    endif
 
 # Patch
@@ -4088,6 +4090,36 @@ _FLAVOR_RECURSIVE_SH= \
 
 #		echo "DBG>> _FLAVOR_RECURSIVE_SH: dir='${dir}' dddir='$$dir' ddbdir='$${dir}' ddbr_dir='$${recursive_dirs}' flavor='$$flavor' recursive_cmd='$${recursive_cmd}'." ; 
 
+_FLAVOR_RECURSIVE_SH2= \
+	if [ -z "$${recursive_cmd}" ]; then \
+		${ECHO_MSG} "_FLAVOR_RECURSIVE_SH requires recursive_cmd to be set to the recursive make target to run." >&2; \
+		${FALSE}; \
+	fi; \
+	if [ "$${recursive_dirs-null}" = "null" ]; then \
+		${ECHO_MSG} "_FLAVOR_RECURSIVE_SH requires recursive_dirs to be set to the directories to recurse." >&2; \
+		${FALSE}; \
+	fi; \
+	_rec_dir1=`${recursive_dir_b}` \
+	_rec_dir2=`${recursive_dir_a}` \
+	recursive_dirs="${_rec_dir2} ${_rec_dir1}" \
+	for dir in $${recursive_dirs}; do \
+		unset flavor FLAVOR; \
+		case $${dir} in \
+			*@*/*) ;; \
+			*@*) \
+				flavor=$${dir\#*@}; \
+				dir=$${dir%@*}; \
+				;; \
+		esac; \
+		case $$dir in \
+		/*) ;; \
+		*) dir=${PORTSDIR}/$$dir ;; \
+		esac; \
+		(cd $$dir; ${SETENV} $${flavor:+FLAVOR=$${flavor}} ${MAKE} $${recursive_cmd}); \
+	done
+
+#		echo "DBG>> _FLAVOR_RECURSIVE_SH: dir='${dir}' dddir='$$dir' ddbdir='$${dir}' ddbr_dir='$${recursive_dirs}' flavor='$$flavor' recursive_cmd='$${recursive_cmd}'." ; 
+
 # This script is shared among several dependency list variables.  See file for
 # usage.
 DEPENDS-LIST= \
@@ -4119,14 +4151,15 @@ clean-depends:
 .    endif
 
 .    if !target(limited-clean-depends)
-BACKQ="`"
+
 limited-clean-depends:
-	echo "DBG>> limited-clean-depends - depends-list='`${CLEAN-DEPENDS-LIMITED-LIST}`."
 	@for dir in `${CLEAN-DEPENDS-LIMITED-LIST}`; do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
 
+#	echo "DBG>> limited-clean-depends - depends-list='`${CLEAN-DEPENDS-LIMITED-LIST}`."
 #		echo "DBG>> limited-clean - dir='${dir}' dddir='$$dir'." ; 
+
 .    endif
 
 .    if !target(deinstall-depends)
@@ -4141,15 +4174,21 @@ fetch-specials:
 	@${ECHO_MSG} "===> Fetching all distfiles required by ${PKGNAME} for building"
 	@recursive_cmd="fetch"; \
 	    recursive_dirs="${_DEPEND_SPECIALS}"; \
-		echo "DBG>> fetch-specials - '${_DEPEND_SPECIALS}'" ; \
 		${_FLAVOR_RECURSIVE_SH}
+
+#		echo "DBG>> fetch-specials - '${_DEPEND_SPECIALS}'" ; 
+
 .    endif
 
 .    if !target(fetch-recursive)
+#	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} `${ALL-DEPENDS-FLAVORS-LIST}`";
 fetch-recursive:
 	@${ECHO_MSG} "===> Fetching all distfiles for ${PKGNAME} and dependencies"
+	recursive_dirs_a='${.CURDIR}${FLAVOR:D@${FLAVOR}}' 
+	recursive_dirs_b=`${ALL-DEPENDS-FLAVORS-LIST}'
+	_recursive_dirs="${recursive_dirs_a} ${recursive_dirs_b}"
 	@recursive_cmd="fetch"; \
-	    recursive_dirs="${.CURDIR}${FLAVOR:D@${FLAVOR}} `${ALL-DEPENDS-FLAVORS-LIST}`"; \
+	    recursive_dirs=${_recursive_dirs} ; \
 		${_FLAVOR_RECURSIVE_SH}
 .    endif
 
@@ -4382,9 +4421,10 @@ missing-packages:
 # Install missing dependencies from package
 install-missing-packages:
 	@_dirs=$`${MISSING-DEPENDS-LIST}`; \
-	echo "DBG>> _dirs: '${_dirs}'." ; \
 	${ECHO_CMD} "$${_dirs}" | ${SED} "s%${PORTSDIR}/%%g" | \
 		${SU_CMD} "${XARGS} -o ${PKG_BIN} install -A"
+
+#	echo "DBG>> _dirs: '${_dirs}'." ; \
 
 ################################################################
 # Everything after here are internal targets and really
@@ -4517,6 +4557,9 @@ ${i:S/-//:tu}=	${WRKDIR}/${SUB_FILES:M${i}*}
 PLIST_SUB_SANITIZED=	${PLIST_SUB:N*_regex=*}
 
 .    if !target(generate-plist)
+
+#	echo "DBG>> generate-plist - file='${file}'."
+
 generate-plist: ${WRKDIR}
 	@${ECHO_MSG} "===>   Generating temporary packing list"
 	@${MKDIR} ${TMPPLIST:H}
@@ -4525,7 +4568,6 @@ generate-plist: ${WRKDIR}
 	@for file in ${PLIST_FILES}; do \
 		${ECHO_CMD} $${file} | ${SED} ${PLIST_SUB_SANITIZED:S/$/!g/:S/^/ -e s!%%/:S/=/%%!/} >> ${TMPPLIST}; \
 	done
-	echo "DBG>> file: '${file}'."
 .      if !empty(PLIST)
 .        for f in ${PLIST}
 	@if [ -f "${f}" ]; then \
@@ -5446,12 +5488,16 @@ ${${target:tu}_COOKIE}::
 
 .    if !target(check-sanity)
 check-sanity: ${_SANITY_REAL_SEQ}
-	echo "DBG>> setting 'check-sanity:': .TARGET='${.TARGET}' TARGET='${TARGET}' real-seq='${_SANITY_REAL_SEQ}'."
+
+#	echo "DBG>> check-sanity: - .TARGET='${.TARGET}' TARGET='${TARGET}' real-seq='${_SANITY_REAL_SEQ}'."
+
 .    endif
 
 .    if !target(fetch)
 fetch: ${_FETCH_DEP} ${_FETCH_REAL_SEQ}
-	echo "DBG>> setting 'fetch:': dep='${_FETCH_DEP}' real-seq='${_FETCH_REL_SEQ}'."
+
+#	echo "DBG>> fetch: - dep='${_FETCH_DEP}' real-seq='${_FETCH_REL_SEQ}'."
+
 .    endif
 
 .    if !target(pkg)

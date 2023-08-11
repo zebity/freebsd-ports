@@ -106,7 +106,7 @@ else
 	for a in "${@}"
 	do
 		savargs[${i}]="${a}"
-#		echo "DBG>> $0 - arg[${i}]: '${a}'."
+#		echo "DBG>> irix.env - $0 - arg[${i}]: '${a}'."
 		let "i=i + 1"
 	done
 
@@ -200,11 +200,11 @@ else
 #		i=0
 #		for a in "${keepargs[@]}"
 #		do
-#			echo "DBG>> $0 - arg[${i}]: '${a}'."
+#			echo "DBG>> irix.env - $0 - arg[${i}]: '${a}'."
 #			let "i=i + 1"
 #		done
 #
-		echo "DBG>> '""${IRIX_ENV}" "${inherit}" "${keepargs[@]}" "'."
+#		echo "DBG>> irix.env - '""${IRIX_ENV}" "${inherit}" "${keepargs[@]}" "'."
 
 		${IRIX_ENV} ${inherit} "${keepargs[@]}"
 	fi

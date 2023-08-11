@@ -38,6 +38,7 @@ for _file in "${@}"; do
 		select=`echo "${_file##*:}" | sed -e 's/,/ /g'`
 	fi
 
+# DBG
 #	echo "DBG>> selected file: '${select}'."
 
 	filebasename=${file##*/}
@@ -124,6 +125,7 @@ for _file in "${@}"; do
 		sites="`${SORTED_MASTER_SITES_CMD_TMP}`"
 	fi
 
+# DBG
 #	echo "DBG>> sites: '${sites}'."
 
 	for site in ${sites}; do
@@ -155,6 +157,7 @@ for _file in "${@}"; do
 		fi
 		_fetch_cmd="${_fetch_cmd} ${args} ${dp_FETCH_AFTER_ARGS}"
 
+# DBG
 #		echo "DBG>> _fetch_cmd: '${_fetch_cmd}'."
 
 		case ${dp_TARGET} in

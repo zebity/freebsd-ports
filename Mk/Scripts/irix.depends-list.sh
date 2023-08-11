@@ -4,11 +4,13 @@
 set -e
 # set -o pipefail
 
-echo "DBG>> irix.depends.list - sourcing functions..."
+# DBG
+# echo "DBG>> irix.depends.list - sourcing functions..." >&2
 
 . ${dp_SCRIPTSDIR}/irix.functions.sh
 
-echo "DBG>> irix.depends.list -sauced."
+# DBG
+# echo "DBG>> irix.depends.list - sauced." >&2
 
 flavors=0
 recursive=0
@@ -17,7 +19,8 @@ requires_wrkdir=0
 
 while getopts "fmrw" FLAG; do
 
-	echo "DBG>> irix.depends-list - flag='${FLAG}'."
+# DBG
+#	echo "DBG>> irix.depends-list - flag='${FLAG}'." >&2
 
 	case "${FLAG}" in
 		f)
@@ -64,13 +67,16 @@ if [ ${missing} -eq 1 ]; then
 	existing=`${dp_PKG_INFO} -aoq|paste -d ' ' -s -`
 fi
 
-check_dep() {
-	local _dep wrkdir show_dep
+function check_dep() { 
+	typeset _dep wrkdir show_dep
+#	local _dep wrkdir show_dep
 
-	echo "DBG>> check_dep - _dep='${_dep}'."
+# DBG
+# 	echo "DBG>> check_dep - _dep='${_dep}'." >&2
 
 	for _dep ; do
-		echo "DBG>> for check_dep - _dep='${_dep}'."
+# DBG
+#		echo "DBG>> for check_dep - _dep='${_dep}'." >&2
 		unset FLAVOR
 		myifs=${IFS}
 		IFS=:
@@ -152,5 +158,6 @@ check_dep() {
 checked=
 # shellcheck disable=SC2068
 # Do not add quotes, we want to split the string here.
-echo "DBG>> irix.depends-list.sh - checking args='${@}'."
+# DBG
+# echo "DBG>> irix.depends-list.sh - checking args='${@}'." >&2
 check_dep $@

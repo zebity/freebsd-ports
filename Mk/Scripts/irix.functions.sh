@@ -1,15 +1,15 @@
-#!/bin/sh -x
+#!/bin/sh
 # This file for common functions used for port scripts.
 #
 # MAINTAINER: portmgr@FreeBSD.org
 
 # Strip (owner,group,perm) from keywords
-_strip_perms() {
+function _strip_perms() { 
 	sed -Ee 's/^@\([^)]*\)[[:space:]]+//' \
 	    -e 's/^(@[[:alpha:]]+)\([^)]*\)[[:space:]]+/\1 /'
 }
 
-_OS_PORTMK="irix.port.mk"
+_OS_PORTMK=irix.port.mk
 
 # Expand TMPPLIST to absolute paths, splitting files and dirs into separate
 # descriptors.
@@ -22,8 +22,9 @@ _OS_PORTMK="irix.port.mk"
 #  fd:1 - list of files
 #  fd:2 - stderr
 #  fd:3 - list of directories
-parse_plist() {
-	local cwd cwd_save commented_cwd comment line newcwd parse_comments \
+function parse_plist() { 
+#	local cwd cwd_save commented_cwd comment line newcwd parse_comments 
+	typeset cwd cwd_save commented_cwd comment line newcwd parse_comments \
 	    PREFIX
 
 	PREFIX="${1}"
@@ -151,8 +152,9 @@ parse_plist() {
 	done
 }
 
-validate_env() {
-	local envfault
+function validate_env() { 
+#	local envfault
+	typeset envfault
 	for i ; do
 		set -f
 		if ! (eval ": \${${i}?}" ) >/dev/null; then
@@ -167,8 +169,9 @@ validate_env() {
 	fi
 }
 
-export_ports_env() {
-	local export_vars make_cmd make_env var value uses
+function export_ports_env() { 
+#	local export_vars make_cmd make_env var value uses
+	typeset export_vars make_cmd make_env var value uses
 
 	if [ -n "${HAVE_PORTS_ENV:-}" ]; then
 		return 0
@@ -196,7 +199,7 @@ export_ports_env() {
 	done
 
 	# Bring in all the vars, but not empty ones.
-	eval "`${MAKE} -f ${PORTSDIR}/Mk/bsd.port.mk ${make_cmd} \
+	eval "`${MAKE} -f ${PORTSDIR}/Mk/${_OS_PORTMK} ${make_cmd} \
 		USES="${uses}" | grep -v '=$' | sed -e 's,\\ $,,'`"
 	for var in ${export_vars}; do
 		# Export and display non-empty ones.  This is not redundant
@@ -215,8 +218,9 @@ export_ports_env() {
 	echo "export HAVE_PORTS_ENV=1"
 }
 
-distinfo_data() {
-	local alg file
+function distinfo_data() { 
+#	local alg file
+	typeset alg file
 
 	alg=$1
 	file=$2
@@ -228,7 +232,7 @@ distinfo_data() {
 		'$1 == alg && $2 == "(" file ")" {print $4}' "${dp_DISTINFO_FILE}"
 }
 
-check_checksum_algorithms() {
+function check_checksum_algorithms() { 
 	for alg in ${dp_CHECKSUM_ALGORITHMS}; do
 		eval "alg_executable=\$dp_$alg"
 		if [ -z "$alg_executable" ]; then
@@ -242,10 +246,10 @@ check_checksum_algorithms() {
 		fi
 	done
 }
-escape() {
+function escape() { 
 	echo "$1" | sed -e 's/[&;()!#]/\\&/g'
 }
-unescape() {
+function unescape() { 
 	echo "$1" | sed -e 's/\\//g'
 }
 
@@ -253,11 +257,15 @@ unescape() {
 # port_var_fetch ports-mgmt/pkg "" PKGNAME pkgname PKGBASE pkgbase ...
 # the 2nd variable is for passing any wanted make arguments, such as
 # DEPENDS_ARGS.
-port_var_fetch() {
-	local origin="$1"
-	local make_args="$2"
-	local _makeflags _vars
-	local _portvar _var _line
+function port_var_fetch() { 
+#	local origin="$1"
+#	local make_args="$2"
+#	local _makeflags _vars
+#	local _portvar _var _line
+	typeset origin="$1"
+	typeset make_args="$2"
+	typeset _makeflags _vars
+	typeset _portvar _var _line
 
 	_makeflags=
 	_vars=
