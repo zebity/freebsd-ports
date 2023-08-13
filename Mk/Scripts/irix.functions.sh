@@ -4,7 +4,7 @@
 # MAINTAINER: portmgr@FreeBSD.org
 
 # Strip (owner,group,perm) from keywords
-function _strip_perms() { 
+_strip_perms() { 
 	sed -Ee 's/^@\([^)]*\)[[:space:]]+//' \
 	    -e 's/^(@[[:alpha:]]+)\([^)]*\)[[:space:]]+/\1 /'
 }
@@ -22,7 +22,7 @@ _OS_PORTMK=irix.port.mk
 #  fd:1 - list of files
 #  fd:2 - stderr
 #  fd:3 - list of directories
-function parse_plist() { 
+parse_plist() { 
 #	local cwd cwd_save commented_cwd comment line newcwd parse_comments 
 	typeset cwd cwd_save commented_cwd comment line newcwd parse_comments \
 	    PREFIX
@@ -67,10 +67,10 @@ function parse_plist() {
 		@dir*|'@unexec rmdir'*|'@unexec /bin/rmdir'*)
 			line="`printf %s "$line" \
 			    | sed -Ee 's/\|\|.*//;s|[[:space:]]+[0-9]*[[:space:]]*>[&]?[[:space:]]*[^[:space:]]+||g' \
-			        -e "/^@unexec[[:space:]]+(\/bin\/)?rmdir( -p)?/s|([^%])%D([^%])|\1${cwd}\2|g" \
-			        -e '/^@unexec[[:space:]]+(\/bin\/)?rmdir( -p)?/s|"(.*)"[[:space:]]*|\1|g' \
-			        -e 's/@unexec[[:space:]]+(\/bin\/)?rmdir( -p)?[[:space:]]+//' \
-				-e 's/@dir(rm|rmtry)?[[:space:]]+//' \
+			        -e "/^@unexec[[:space:]]+\(\/bin\/\)?rmdir\( -p\)?/s|\([^%]\)%D\([^%]\)|\1${cwd}\2|g" \
+			        -e '/^@unexec[[:space:]]+\(\/bin\/\)?rmdir\( -p\)?/s|"\(.*\)"[[:space:]]*|\1|g' \
+			        -e 's/@unexec[[:space:]]+\(\/bin\/\)?rmdir\( -p\)?[[:space:]]+//' \
+				-e 's/@dir\(rm|rmtry\)?[[:space:]]+//' \
 				-e 's/[[:space:]]+$//'`"
 			case "$line" in
 			/*) echo >&3 "${comment}${line%/}" ;;
@@ -152,7 +152,7 @@ function parse_plist() {
 	done
 }
 
-function validate_env() { 
+validate_env() { 
 #	local envfault
 	typeset envfault
 	for i ; do
@@ -169,7 +169,7 @@ function validate_env() {
 	fi
 }
 
-function export_ports_env() { 
+export_ports_env() { 
 #	local export_vars make_cmd make_env var value uses
 	typeset export_vars make_cmd make_env var value uses
 
@@ -218,7 +218,7 @@ function export_ports_env() {
 	echo "export HAVE_PORTS_ENV=1"
 }
 
-function distinfo_data() { 
+distinfo_data() { 
 #	local alg file
 	typeset alg file
 
@@ -232,7 +232,7 @@ function distinfo_data() {
 		'$1 == alg && $2 == "(" file ")" {print $4}' "${dp_DISTINFO_FILE}"
 }
 
-function check_checksum_algorithms() { 
+check_checksum_algorithms() { 
 	for alg in ${dp_CHECKSUM_ALGORITHMS}; do
 		eval "alg_executable=\$dp_$alg"
 		if [ -z "$alg_executable" ]; then
@@ -246,10 +246,10 @@ function check_checksum_algorithms() {
 		fi
 	done
 }
-function escape() { 
+escape() { 
 	echo "$1" | sed -e 's/[&;()!#]/\\&/g'
 }
-function unescape() { 
+unescape() { 
 	echo "$1" | sed -e 's/\\//g'
 }
 
@@ -257,7 +257,7 @@ function unescape() {
 # port_var_fetch ports-mgmt/pkg "" PKGNAME pkgname PKGBASE pkgbase ...
 # the 2nd variable is for passing any wanted make arguments, such as
 # DEPENDS_ARGS.
-function port_var_fetch() { 
+port_var_fetch() { 
 #	local origin="$1"
 #	local make_args="$2"
 #	local _makeflags _vars

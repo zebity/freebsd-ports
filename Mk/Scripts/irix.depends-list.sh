@@ -1,8 +1,16 @@
-#!/bin/sh -x
+#!/bin/sh
 # MAINTAINER: portmgr@FreeBSD.org
 
 set -e
 # set -o pipefail
+
+# DBG
+# _acnt=1
+# for _xxarg in "${@}"
+# do
+# 	echo "${0} - arg[${_acnt}]='${_xxarg}'" >&2
+#  	let "_acnt=_acnt + 1"
+# done
 
 # DBG
 # echo "DBG>> irix.depends.list - sourcing functions..." >&2
@@ -67,7 +75,7 @@ if [ ${missing} -eq 1 ]; then
 	existing=`${dp_PKG_INFO} -aoq|paste -d ' ' -s -`
 fi
 
-function check_dep() { 
+check_dep() { 
 	typeset _dep wrkdir show_dep
 #	local _dep wrkdir show_dep
 

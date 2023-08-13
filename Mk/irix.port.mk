@@ -4185,7 +4185,7 @@ fetch-specials:
 fetch-recursive:
 	@${ECHO_MSG} "===> Fetching all distfiles for ${PKGNAME} and dependencies"
 	recursive_dirs_a='${.CURDIR}${FLAVOR:D@${FLAVOR}}' 
-	recursive_dirs_b=`${ALL-DEPENDS-FLAVORS-LIST}'
+	recursive_dirs_b=`${ALL-DEPENDS-FLAVORS-LIST}`
 	_recursive_dirs="${recursive_dirs_a} ${recursive_dirs_b}"
 	@recursive_cmd="fetch"; \
 	    recursive_dirs=${_recursive_dirs} ; \
