@@ -28,6 +28,13 @@
 #
 # MAINTAINER: ports@FreeBSD.org
 
+_MIPSPRO!=CC -version 2>&1 | cut -f1 -d" "
+.if  ${_MIPSPRO} == "MIPSpro"
+CC_VER_FLAG="-version"
+.else
+CC_VER_FLAG="--version"
+.endif
+
 .if !defined(_INCLUDE_USES_COMPILER_MK)
 _INCLUDE_USES_COMPILER_MK=	yes
 
@@ -77,7 +84,8 @@ _COMPILER_ARGS+=	features
 .  if defined(_CCVERSION_${_CC_hash})
 _CCVERSION=	${_CCVERSION_${_CC_hash}}
 .  else
-_CCVERSION!=	${CC} --version
+# _CCVERSION!=	${CC} --version
+_CCVERSION!=	${CC} ${CC_VER_FLAG} 2>&1
 _CCVERSION_${_CC_hash}=	${_CCVERSION}
 PORTS_ENV_VARS+=	_CCVERSION_${_CC_hash}
 .  endif
