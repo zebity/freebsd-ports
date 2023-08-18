@@ -133,9 +133,12 @@ CHOSEN_COMPILER_TYPE=	gcc
 .    if defined(_CXXINTERNAL_${_CXX_hash})
 _CXXINTERNAL=	${_CXXINTERNAL_${_CXX_hash}}
 .    else
+# _CXXINTERNAL!=	${CXX} -\#\#\# /dev/null 2>&1
+.      if  ${_MIPSPRO} == "MIPSpro"
+_CXXINTERNAL!= echo "int main(){return 0;}" > /tmp/kunjwohs284.c && cc -64 -mips4 -v -o /tmp/kunjwohs284 /tmp/kunjwohs284.c 2>&1 && rm /tmp/kunjwohs284* > /dev/null
+.      else
 _CXXINTERNAL!=	${CXX} -\#\#\# /dev/null 2>&1
-_CXXINTERNAL_${_CXX_hash}=	${_CXXINTERNAL}
-PORTS_ENV_VARS+=	_CXXINTERNAL_${_CXX_hash}
+.      endif
 .    endif
 .    if ${_CXXINTERNAL:M\"-lc++\"}
 COMPILER_FEATURES=	libc++
@@ -155,7 +158,11 @@ _LANG=c++
 .      if defined(CC_OUTPUT_${_CC_hash}_${std:hash})
 OUTPUT_${std}=	${CC_OUTPUT_${_CC_hash}_${std:hash}}
 .      else
+.        if  ${_MIPSPRO} == "MIPSpro"
+OUTPUT_${std}!= if echo "int main(){return 0;}" > /tmp/kunjwohs284.c && cc -64 -mips4 -c -${std} -x ${_LANG} -o /tmp/kunjwohs284.o /tmp/kunjwohs284.c 2>&1 && rm /tmp/kunjwohs284* > /dev/null ; then echo yes; fi; echo
+.        else
 OUTPUT_${std}!=	if ${CC} -std=${std} -c -x ${_LANG} /dev/null -o /dev/null 2>&1; then echo yes; fi; echo
+.        endif
 CC_OUTPUT_${_CC_hash}_${std:hash}=	${OUTPUT_${std}}
 PORTS_ENV_VARS+=			CC_OUTPUT_${_CC_hash}_${std:hash}
 .      endif
