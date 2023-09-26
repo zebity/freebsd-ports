@@ -12,8 +12,9 @@ Description File within port you can see if it has been IRIXised.
 SPECIAL NOTE:
 
 The FreeBSD Ports scripts make heavy use of Korn Shell style "$(...)" command substitution
-syntax (vs traditional shell backquotes "`...`". To ensure this that SGI IRIX treats
-the $() correctly you have to ensure that the environment variable _XPG=1 .
+syntax (vs traditional shell backquotes "`...`".
+The IRIX sh (ksh) requires that the _XPG=1 environment variable must be set to correctly
+handle $( ) syntax.
 I do this by starting new shell: _XPG=1 sh
 If you find that everything is failing then not doing this is likely cause.
 
