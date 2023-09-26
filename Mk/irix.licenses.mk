@@ -647,7 +647,7 @@ ${_LICENSE_COOKIE}:
 .        if ${_LICENSE_COMB} == "single"
 	@${DIALOG} --title "License for ${PKGNAME} (${_LICENSE})" \
 		--yes-label Accept --no-label Reject --yesno \
-		"$`${CAT} ${_LICENSE_FILE}`" 21 76
+		"$$(${CAT} ${_LICENSE_FILE})" 21 76
 
 .        elif ${_LICENSE_COMB} == "dual"
 	@${RM} ${_LICENSE_ASK_DATA}
@@ -656,20 +656,20 @@ ${_LICENSE_COOKIE}:
 .          endfor
 	@menu_cmd="${DIALOG} --hline \"This port requires you to accept at least one license\" --menu \"License for ${PKGNAME} (dual)\" 21 70 15"; \
 	trap '${RM} $$tmpfile' EXIT INT TERM; \
-	tmpfile=$`mktemp -t portlicenses`; \
+	tmpfile=$$(mktemp -t portlicenses); \
 	for lic in ${_LICENSE_TO_ASK}; do \
 		menu_cmd="$${menu_cmd} VIEW_$${lic} \"View the license $${lic}\" USE_$${lic} \"Accept the license $${lic}\""; \
 	done; \
 	menu_cmd="$${menu_cmd} REJECT \"Reject the licenses (all)\""; \
 	while true; do \
 		${SH} -c "$${menu_cmd} 2>\"$${tmpfile}\""; \
-		result=$`${CAT} "$${tmpfile}"`; \
+		result=$$(${CAT} "$${tmpfile}"); \
 		case $${result} in \
 		REJECT) exit 1;; \
-		VIEW_*) name=$`${ECHO_CMD} $${result} | ${SED} -e 's/^VIEW_//'`; \
-				file=`${GREP} "^$${name}:" ${_LICENSE_ASK_DATA} | ${CUT} -d : -f 2`; \
+		VIEW_*) name=$$(${ECHO_CMD} $${result} | ${SED} -e 's/^VIEW_//'); \
+				file=$$(${GREP} "^$${name}:" ${_LICENSE_ASK_DATA} | ${CUT} -d : -f 2); \
 				${DIALOG} --textbox "$${file}" 21 75 ;; \
-		USE_*)  name=$`${ECHO_CMD} $${result} | ${SED} -e 's/^USE_//'`; \
+		USE_*)  name=$$(${ECHO_CMD} $${result} | ${SED} -e 's/^USE_//'); \
 				${ECHO_CMD} $${name} > ${_LICENSE_COOKIE}; \
 				break ;; \
 		esac; \
@@ -682,19 +682,19 @@ ${_LICENSE_COOKIE}:
 .          endfor
 	@menu_cmd="${DIALOG} --hline \"This port requires you to accept all mentioned licenses\" --menu \"License for ${PKGNAME} (multi)\" 21 70 15"; \
 	trap '${RM} $$tmpfile' EXIT INT TERM; \
-	tmpfile=$`mktemp -t portlicenses`; \
+	tmpfile=$$(mktemp -t portlicenses); \
 	for lic in ${_LICENSE_TO_ASK}; do \
 		menu_cmd="$${menu_cmd} VIEW_$${lic} \"View the license $${lic}\""; \
 	done; \
 	menu_cmd="$${menu_cmd} ACCEPT \"Accept the licenses (all)\" REJECT \"Reject the licenses (all)\""; \
 	while true; do \
 		${SH} -c "$${menu_cmd} 2>\"$${tmpfile}\""; \
-		result=$`${CAT} "$${tmpfile}"`; \
+		result=$$(${CAT} "$${tmpfile}"); \
 		case $${result} in \
 		ACCEPT) break ;; \
 		REJECT) exit 1 ;; \
-		VIEW_*) name=$`${ECHO_CMD} $${result} | ${SED} -e 's/^VIEW_//'`; \
-				file=$`${GREP} "^$${name}:" ${_LICENSE_ASK_DATA} | ${CUT} -d : -f 2`; \
+		VIEW_*) name=$$(${ECHO_CMD} $${result} | ${SED} -e 's/^VIEW_//'); \
+				file=$$(${GREP} "^$${name}:" ${_LICENSE_ASK_DATA} | ${CUT} -d : -f 2); \
 				${DIALOG} --textbox "$${file}" 21 75 ;; \
 		esac; \
 	done
@@ -732,10 +732,11 @@ ${_LICENSE_COOKIE}:
 
 # Create report and catalog
 .    if !defined(NO_LICENSES_INSTALL)
+#	@${RM} ${_LICENSE_CATALOG_TMP} ${_LICENSE_REPORT_TMP}
 	if [ ${RM} ${_LICENSE_CATALOG_TMP} ${_LICENSE_REPORT_TMP} ]; then \
 		true; \
 	else \
-		echo "DBG>> license removal catalog='{${LICENSE_CATALOG_TMP}' report='${_LICENSE_REPORT_TMP}' failed continuing ..." ; \
+		echo "DBG>> license removal catalog='${LICENSE_CATALOG_TMP}' report='${_LICENSE_REPORT_TMP}' failed continuing ..." ; \
 	fi
 .      if ${_LICENSE_COMB} == "single"
 # Catalog

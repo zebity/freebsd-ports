@@ -9,6 +9,13 @@ SGI IRIX systems.
 To keep things simple the tree has not been trimmed but if you look at the
 Description File within port you can see if it has been IRIXised.
 
+SPECIAL NOTE:
+
+The FreeBSD Ports scripts make heavy use of Korn Shell style "$(...)" command substitution
+syntax (vs traditional shell backquotes "`...`". To ensure this that SGI IRIX treats
+the $() correctly you have to ensure that the environment variable _XPG=1 .
+I do this by starting new shell: _XPG=1 sh
+If you find that everything is failing then not doing this is likely cause.
 
 STARTING:
 
