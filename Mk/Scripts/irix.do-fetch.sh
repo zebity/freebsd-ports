@@ -1,13 +1,13 @@
-#!/bin/sh -x
+#!/bin/sh
 #
 # MAINTAINER: portmgr@FreeBSD.org
-#
+
 set -e
 # set -o pipefail
 
 SETENV_EXT=/usr/local2/bin/env
 
-. "${dp_SCRIPTSDIR}/functions.sh"
+. "${dp_SCRIPTSDIR}/irix.functions.sh"
 
 validate_env dp_DEVELOPER dp_DISABLE_SIZE dp_DISTDIR dp_DISTINFO_FILE \
 	dp_DIST_SUBDIR dp_ECHO_MSG dp_FETCH_AFTER_ARGS dp_FETCH_BEFORE_ARGS \
@@ -32,14 +32,11 @@ for _file in "${@}"; do
 	file=${_file%%:*}
 
 	# If this files has groups
-	if [ "${_file}" = "${file}" ]; then
+	if [ "$_file" = "$file" ]; then
 		select=DEFAULT
 	else
-		select=`echo "${_file##*:}" | sed -e 's/,/ /g'`
+		select=$(echo "${_file##*:}" | sed -e 's/,/ /g')
 	fi
-
-# DBG
-#	echo "DBG>> selected file: '${select}'."
 
 	filebasename=${file##*/}
 	if [ -n "${dp_FORCE_FETCH_ALL}" ]; then
@@ -109,8 +106,7 @@ for _file in "${@}"; do
 		fi
 	done
 	___MASTER_SITES_TMP=
-#	SORTED_MASTER_SITES_CMD_TMP="echo ${dp_MASTER_SITE_OVERRIDE} $(echo -n "${__MASTER_SITES_TMP}" | awk "${dp_MASTER_SORT_AWK}") ${dp_MASTER_SITE_BACKUP}"
-	SORTED_MASTER_SITES_CMD_TMP="echo ${dp_MASTER_SITE_OVERRIDE} `echo -n "${__MASTER_SITES_TMP}" | awk "${dp_MASTER_SORT_AWK}"` ${dp_MASTER_SITE_BACKUP}"
+	SORTED_MASTER_SITES_CMD_TMP="echo ${dp_MASTER_SITE_OVERRIDE} $(echo -n "${__MASTER_SITES_TMP}" | awk "${dp_MASTER_SORT_AWK}") ${dp_MASTER_SITE_BACKUP}"
 	case ${dp_TARGET} in
 		fetch-list)
 			echo -n "mkdir -p ${dp_DISTDIR} && "
@@ -119,21 +115,16 @@ for _file in "${@}"; do
 	esac
 	sites_remaining=0
 	if [ -n "${dp_RANDOMIZE_SITES}" ]; then
-#		sites="`${SORTED_MASTER_SITES_CMD_TMP} | ${dp_RANDOMIZE_SITES}`"
-		sites="`${SORTED_MASTER_SITES_CMD_TMP} | ${dp_RANDOMIZE_SITES}`"
+		sites="$(${SORTED_MASTER_SITES_CMD_TMP} | ${dp_RANDOMIZE_SITES})"
 	else
-		sites="`${SORTED_MASTER_SITES_CMD_TMP}`"
+		sites="$(${SORTED_MASTER_SITES_CMD_TMP})"
 	fi
-
-# DBG
-#	echo "DBG>> sites: '${sites}'."
-
 	for site in ${sites}; do
-		let "sites_remaining=sites_remaining + 1"
+		sites_remaining=$((sites_remaining + 1))
 	done
 	for site in ${sites}; do
-		let "sites_remaining=sites_remaining - 1"
-		CKSIZE=`distinfo_data SIZE "${full_file}"`
+		sites_remaining=$((sites_remaining - 1))
+		CKSIZE=$(distinfo_data SIZE "${full_file}")
 		# There is a lot of escaping, but the " needs to survive echo/eval.
 		case ${file} in
 			*/*)
@@ -156,16 +147,11 @@ for _file in "${@}"; do
 			_fetch_cmd="${_fetch_cmd} -S ${CKSIZE}"
 		fi
 		_fetch_cmd="${_fetch_cmd} ${args} ${dp_FETCH_AFTER_ARGS}"
-
-# DBG
-#		echo "DBG>> _fetch_cmd: '${_fetch_cmd}'."
-
 		case ${dp_TARGET} in
 			do-fetch|makesum)
 				${dp_ECHO_MSG} "=> Attempting to fetch ${site}${file}"
 				if ${SETENV_EXT} -S "${dp_FETCH_ENV}" ${_fetch_cmd}; then
-#					actual_size=$(stat -f %z "${file}")
-					actual_size=`stat -qs "${file}"`
+					actual_size=$(stat -f %z "${file}")
 					if [ -n "${dp_DISABLE_SIZE}" ] || [ -z "${CKSIZE}" ] || [ "${actual_size}" -eq "${CKSIZE}" ]; then
 						continue 2
 					else
@@ -178,7 +164,7 @@ for _file in "${@}"; do
 				fi
 				;;
 			fetch-list)
-				echo -n "env `escape "${_fetch_cmd}"` || "
+				echo -n "env $(escape "${_fetch_cmd}") || "
 				;;
 			fetch-url-list-int)
 				echo ${args}
