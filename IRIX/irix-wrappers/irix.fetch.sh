@@ -14,6 +14,7 @@
 # DESCRIPTION:
 #	Not Compatible with FreeBSD fetch, as this only handle http
 #       Hence "optimistic", all requests will be passed to SGI freeware wget
+#        or nekoware curl (https)
 #       Returns 0 == ok
 #	        1 == not ok
 #	
@@ -158,6 +159,10 @@ else
 	return 1
 fi
 
+if [ -f /usr/nekoware/bin/curl ]; then
+	CURL=/usr/nekoware/bin/curl
+fi
+
 while :
 do
         case "$1" in
@@ -199,8 +204,11 @@ done
 
 echo "IRIX fetch files: '${files}'"
 
+res=0
+
 for f in $files
 do
+	USE_CURL=0
 	b=`basename $f`
 	if [ -f $b ]; then
 		echo "Skipping as file already exists: '$b'."
@@ -211,8 +219,14 @@ do
 		if [ "${https}" = "https:" ]; then
 			l=${#f}
 		 	r=`echo "${f}" | cut -b 7-${l}`
-			gf="http:"${r}
-			echo "Changing to http: '${gf}'."
+			if [ "${CURL}" = "" ]; then
+				gf="http:"${r}
+				echo "Changing to http: '${gf}'."
+			else
+				gf="https:"${r}
+				echo "Get https (with curl): '${gf}'."
+				USE_CURL=1
+			fi
 		elif [ "${http}" = "http:" ]; then
 			gf=${f}
 			echo "Get with http: '${gf}'."
@@ -223,7 +237,11 @@ do
 			gf="http://"${f}
 			echo "Optimistic change to: '${gf}'."
 		fi
-		${WGET} ${gf}
+		if [ ${USE_CURL} -eq 1 ]; then
+			${CURL} ${gf}
+		else
+			${WGET} ${gf}
+		fi
 		res=$?
 		if [ ${res} -eq 0 ] && [ "${one}" = "yes" ]; then
 			return 0
