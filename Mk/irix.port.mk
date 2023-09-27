@@ -2,7 +2,7 @@
 # ex:ts=4
 #
 #	irix.port.mk - 20230719 John Hartley.
-#	based bsd.port.mk - 940820 Jordan K. Hubbard.
+#	based on: bsd.port.mk - 940820 Jordan K. Hubbard.
 #	This file is in the public domain.
 #
 # Please view me with 4 column tabs!
@@ -2021,6 +2021,9 @@ DISTINFO_FILE?=		${MASTERDIR}/distinfo
 MAKE_FLAGS?=	-f
 MAKEFILE?=		Makefile
 MAKE_CMD?=		${BMAKE}
+.if ${MAKE_CMD} == ""
+MAKE_CMD = ${BSDMAKE}
+.endif
 MAKE_ENV+=		PREFIX=${PREFIX} \
 			LOCALBASE=${LOCALBASE} \
 			CC="${CC}" CFLAGS="${CFLAGS}" \
@@ -3175,15 +3178,19 @@ fetch-url-list: fetch-url-list-int
 # Extract
 
 clean-wrkdir:
-	if [ -e "${WRKDIR}"]; then \
-		${RM} -f ${WRKDIR} \
+	if [ -e "${WRKDIR}" ]; then \
+		${RM} -r ${WRKDIR} ; \
 	else \
-		echo "DBG>> clean-workdir: - workdir='${WRKDIR}' not found, continuing..." ; \
+		echo "DBG>> clean-workdir - workdir='${WRKDIR}' not found, continuing..." ; \
 	fi
 
 #	@${RM} -r ${WRKDIR}
 
 .    if !target(do-extract)
+
+# DBG
+#	echo "DBG>> do-extract: file='${file}' dollarsfile='$$file' workdir='${EXTRACT_WRKDIR}' cmd='${EXTRACT_CMD}' before='${EXTRACT_BEFORE_ARGS}' distfile='${_DISTDIR}/$$file' after='${EXTRACT_AFTER_ARGS}'.";
+
 do-extract: ${EXTRACT_WRKDIR}
 	for file in ${EXTRACT_ONLY}; do \
 		if ! (cd ${EXTRACT_WRKDIR} && ${EXTRACT_CMD} ${EXTRACT_BEFORE_ARGS} ${_DISTDIR}/$$file ${EXTRACT_AFTER_ARGS});\
@@ -4079,7 +4086,7 @@ DEPENDS-LIST= \
 			dp_PKG_INFO="${PKG_INFO}" \
 			dp_SCRIPTSDIR="${SCRIPTSDIR}" \
 			dp_OVERLAYS="${OVERLAYS}" \
-			${SH} ${SCRIPTSDIR}/depends-list.sh \
+			${SH} ${SCRIPTSDIR}/irix.depends-list.sh \
 			${DEPENDS_SHOW_FLAVOR:D-f}
 
 ALL-DEPENDS-LIST=			${DEPENDS-LIST} -r ${_UNIFIED_DEPENDS:Q}
@@ -4104,6 +4111,10 @@ limited-clean-depends:
 	@for dir in $$(${CLEAN-DEPENDS-LIMITED-LIST}); do \
 		(cd $$dir; ${MAKE} NOCLEANDEPENDS=yes clean); \
 	done
+
+# DBG
+#	echo "DBG>> limited-clean-depends - depends-list='`${CLEAN-DEPENDS-LIMITED-LIST}`."
+
 .    endif
 
 .    if !target(deinstall-depends)
@@ -4119,6 +4130,9 @@ fetch-specials:
 	@recursive_cmd="fetch"; \
 	    recursive_dirs="${_DEPEND_SPECIALS}"; \
 		${_FLAVOR_RECURSIVE_SH}
+
+# DBG
+#		echo "DBG>> fetch-specials - '${_DEPEND_SPECIALS}'" ;
 .    endif
 
 .    if !target(fetch-recursive)
@@ -4358,8 +4372,12 @@ missing-packages:
 # Install missing dependencies from package
 install-missing-packages:
 	@_dirs=$$(${MISSING-DEPENDS-LIST}); \
+	echo "DBG>> _dirs: '${_dirs}'." ; \
 	${ECHO_CMD} "$${_dirs}" | ${SED} "s%${PORTSDIR}/%%g" | \
 		${SU_CMD} "${XARGS} -o ${PKG_BIN} install -A"
+
+# DBG
+#	echo "DBG>> _dirs: '${_dirs}'." ; \
 
 ################################################################
 # Everything after here are internal targets and really
@@ -4930,7 +4948,7 @@ do-config:
 	fi
 	@TMPOPTIONSFILE=$$(mktemp -t portoptions); \
 	trap "${RM} $${TMPOPTIONSFILE}; exit 1" 1 2 3 5 10 13 15; \
-	${SETENV} ${D4P_ENV} ${SH} ${SCRIPTSDIR}/dialog4ports.sh $${TMPOPTIONSFILE} || { \
+	${SETENV} ${D4P_ENV} ${SH} ${SCRIPTSDIR}/irix.dialog4ports.sh $${TMPOPTIONSFILE} || { \
 		${RM} $${TMPOPTIONSFILE}; \
 		${ECHO_CMD}; \
 		${ECHO_MSG} "===> Options unchanged"; \
@@ -5419,10 +5437,18 @@ ${${target:tu}_COOKIE}::
 
 .    if !target(check-sanity)
 check-sanity: ${_SANITY_REAL_SEQ}
+
+# DBG
+#	echo "DBG>> check-sanity: - .TARGET='${.TARGET}' TARGET='${TARGET}' real-seq='${_SANITY_REAL_SEQ}'."
+
 .    endif
 
 .    if !target(fetch)
 fetch: ${_FETCH_DEP} ${_FETCH_REAL_SEQ}
+
+# DBG
+#	echo "DBG>> fetch: - dep='${_FETCH_DEP}' real-seq='${_FETCH_REL_SEQ}'."
+
 .    endif
 
 .    if !target(pkg)
