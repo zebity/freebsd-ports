@@ -23,6 +23,12 @@ STARTING:
 To start IRIX ports you need to first bootstrap bmake and add a couple of
 IRIX wrapper scripts into bmake macro and the target bin directory
 
+The following additional IRIX software is assumed to be installed:
+ a. - SGI Freeware: tar, wget
+ b. = Nekoware: curl, openssl, openldap, perl (and dependent libraries)
+
+Your PATH should include: /usr/local2/bin (for this stuff), /usr/freeware/bin (for SGI Freeware), /usr/nekoware/bin (for nekoware) 
+
 To Bootstrap bmake:
 
 1 - cd /usr/ports/IRIX/bootstrap
@@ -48,7 +54,7 @@ Other Bootstrapping bits (dialog4ports. openssl)
 2 - cd /usr/ports/ports-mgmt/dialog4ports
 3 - bmake -d l extract NO_CHECKSUM=yes EXTRACT_BEFORE_ARGS=-xzf prefix=/usr/local2
 .... next step
-4 - bmake -d l build NO_CHECKSUM=yes EXTRACT_BEFORE_ARGS=-xzf CC=cd99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" prefix=/usr/local2
+4 - bmake -d l build NO_CHECKSUM=yes EXTRACT_BEFORE_ARGS=-xzf CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" prefix=/usr/local2
 
 
 
