@@ -15,9 +15,9 @@ CC=c99
 CFLAGS+=-mips4 -64 -I.
 LDFLAGS+=-mip4 -64
 
-SRCS=	err.c
+SRCS=	err.c stringlist.c
 
-INCS=	err.h
+INCS=	err.h stringlist.h
 
 CLEANFILES=
 
