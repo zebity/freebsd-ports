@@ -15,14 +15,43 @@ CC=c99
 CFLAGS+=-mips4 -64 -I.
 LDFLAGS+=-mip4 -64
 
-SRCS=	err.c stringlist.c
+prefix?=/usr/local2
 
-INCS=	err.h stringlist.h
+SRCS=	err.c stringlist.c strsep.c
+
+INCS=	err.h stringlist.h strsep.h namespace.h un-namespace.h
+
+.MAIN: build
+
+# .PHONY = install
 
 CLEANFILES=
 
 SHLIB_MAJOR=	1
 
+LLIB = lib${LIB}.a
 
-.include <irix.lib.mk>
-.include <sys/IRIX.mk>
+ILIB = ${prefix}/lib/${LLIB}
+IINCDIR = ${prefix}/include/
+
+IHEADERS = ${INCS:M*.h:S/^/${IINCDIR}/g}
+
+IINC = ${prefix}/include
+OBJS=${SRCS:M*.c:R:S/$/.o/g}
+
+.c.o:
+	c99 ${CFLAGS} -c -o $@ $<
+
+${LLIB}: ${OBJS}
+	ar -cr $@ ${.ALLSRC}
+
+${IHEADERS}: ${INCS}
+	cp ${.ALLSRC} ${IINCDIR}
+
+${ILIB}: ${LLIB}
+	cp ${LLIB} ${ILIB}
+
+build: ${LLIB}
+
+install: ${IHEADERS} ${ILIB}
+
