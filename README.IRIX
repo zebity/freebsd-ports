@@ -32,10 +32,11 @@ Your PATH should include: /usr/local2/bin (for this stuff), /usr/freeware/bin (f
 To Bootstrap bmake:
 
 1 - cd /usr/ports/IRIX/bootstrap
-2 - ./irix-ports-bootstrap.sh [-c] [-m] [-d] [-a /local/archive] -b /build/dir prefix=/install/dir
+2 - ./irix-ports-bootstrap.sh [-c] [-m] [-n] [-d] [-a /local/archive] -b /build/dir prefix=/install/dir
     where:
     -c == cleanup / delete the bmake/dialog download and working directory once done
     -m == bootstrap bmake
+    -n == bootstrap ncurses
     -d == bootstrap dialog
     -a == optional archive location to find bmake / dialog archives if not able to download
     -b == download and build bmake in the /build/directory
