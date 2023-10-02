@@ -138,7 +138,7 @@ else
 				${GZCAT} ${ncurses_taz} | ${TAR} -xvf -
 				ncurses_dir=ncurses-6.4
 				( cd ${ncurses_dir}
-					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" CXX=CC CXXFLAGS="-64 -mips4 -LANG:std" --without-debug --prefix=${prefix_dir} 
+					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" CXX=CC CXXFLAGS="-64 -mips4 -LANG:std" --enable-widec --without-debug --prefix=${prefix_dir} 
 					make
 					make install
 				)
@@ -172,7 +172,7 @@ else
 				${GZCAT} ${dialog_taz} | ${TAR} -xvf -
 				dialog_dir=`ls | grep dialog- | cut -f1 -d" "`
 				( cd ${dialog_dir}
-					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" --with-ncurses --prefix=${prefix_dir} 
+					./configure CC=c99 CFLAGS="-64 -mips4 -O2" LDFLAGS="-64 -mips4" --with-ncursesw --prefix=${prefix_dir} 
 					${prefix_dir}/bin/bmake -f makefile 
 					${prefix_dir}/bin/bmake -f makefile install-full
 				)
